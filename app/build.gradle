@@ -54,6 +54,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'com.github.jkwiecien:EasyImage:3.2.0'
 
     //Declaring the room database dependencies.
     def room_version = "2.3.0"
