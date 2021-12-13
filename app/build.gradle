@@ -1,13 +1,22 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Akhil\\Documents\\COM31007\\keyStore.jks')
+            storePassword 'com4510iscool'
+            keyAlias 'com4510'
+            keyPassword 'com4510iscool'
+        }
+    }
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.example.com31007"
+        applicationId "uk.ac.shef.oak.com4510"
         minSdk 21
         targetSdk 31
         versionCode 1
