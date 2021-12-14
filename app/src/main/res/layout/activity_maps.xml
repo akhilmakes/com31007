@@ -24,4 +24,13 @@
 
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:text="START"
+        android:fontFamily="sans-serif"/>
+
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

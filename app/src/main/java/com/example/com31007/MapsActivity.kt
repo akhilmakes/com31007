@@ -38,6 +38,7 @@ internal class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocat
                 // Permission is granted. Continue the action or workflow in your
                 // app.
 
+
             } else {
                 // Explain to the user that the feature is unavailable because the
                 // features requires a permission that the user has denied. At the
