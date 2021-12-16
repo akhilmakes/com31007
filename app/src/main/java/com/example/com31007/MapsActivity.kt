@@ -39,6 +39,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
     private fun hasLocationsPermissions() =
         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
+    private fun hasBackgroundLocationPermissions() =
+        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+
     private fun hasWriteToStoragePermissions() =
         ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
@@ -46,25 +49,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
         ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
 
 
-    private fun checkAndRequestPermissions() {
 
-        var permissionsToRequest  = mutableListOf<String>()
 
-        if(hasLocationsPermissions() != PackageManager.PERMISSION_GRANTED){
-            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+    private fun requestStoragePermissions(){
+        var storagePermissions = mutableListOf<String>()
+
         if(hasWriteToStoragePermissions() != PackageManager.PERMISSION_GRANTED){
-            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            storagePermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
         if(hasReadFromStoragePermissions() != PackageManager.PERMISSION_GRANTED){
-            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            storagePermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-
-
-        if(permissionsToRequest.isNotEmpty()){
-            ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), 0)
+        if(storagePermissions.isNotEmpty()){
+            ActivityCompat.requestPermissions(this, storagePermissions.toTypedArray(), 0)
         }
     }
+
+    private fun requestLocationPermissions() {
+
+        var locationPermissions  = mutableListOf<String>()
+
+        if(hasLocationsPermissions() != PackageManager.PERMISSION_GRANTED){
+            locationPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if(hasBackgroundLocationPermissions() != PackageManager.PERMISSION_GRANTED){
+            locationPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        if(locationPermissions.isNotEmpty()){
+            ActivityCompat.requestPermissions(this, locationPermissions.toTypedArray(), 1)
+        }
+
+    }
+
+
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
@@ -79,6 +96,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
             }
         }
 
+        if (requestCode == 1 && grantResults.isNotEmpty()){
+            for (i in grantResults.indices) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Permission Request:", "${permissions[i]} granted")
+                }
+
+            }
+        }
+
+    }
+
+    private fun checkAndRequestPermissions(){
+        requestStoragePermissions()
+        requestLocationPermissions()
     }
 
 
@@ -87,8 +118,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         checkAndRequestPermissions()
+
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
