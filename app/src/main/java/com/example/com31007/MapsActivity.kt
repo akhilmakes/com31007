@@ -2,12 +2,18 @@ package com.example.com31007
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 
@@ -20,17 +26,29 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.com31007.databinding.ActivityMapsBinding
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 import pl.aprilapps.easyphotopicker.*
+import java.text.DateFormat
+import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var easyImage: EasyImage
+    private lateinit var ctx: Context
+
+    private lateinit var locationRequest: LocationRequest
+    private var mCurrentLocation: Location? = null
+    private var mLastUpdateTime: String? = null
+    private var mLocationPendingIntent: PendingIntent? = null
+    private val ACCESS_FINE_LOCATION = 123
+    private var mButtonStart: Button? = null
+    private var mButtonEnd: Button? = null
+
 
     private lateinit var fusedLocationClient : FusedLocationProviderClient
 
@@ -39,8 +57,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkAndRequestPermissions()
 
+        setActivity(this)
+        setContext(this)
 
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
@@ -51,6 +70,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        mButtonStart = findViewById<View>(R.id.button_start) as Button
+        mButtonStart!!.setOnClickListener {
+            startLocationUpdates()
+            if (mButtonEnd != null) mButtonEnd!!.isEnabled = true
+            mButtonStart!!.isEnabled = false
+        }
+        mButtonStart!!.isEnabled = true
+
+        mButtonEnd = findViewById<View>(R.id.button_end) as Button
+        mButtonEnd!!.setOnClickListener {
+            stopLocationUpdates()
+            if (mButtonStart != null) mButtonStart!!.isEnabled = true
+            mButtonEnd!!.isEnabled = false
+        }
+        mButtonEnd!!.isEnabled = false
 
         // Floating Action Button to select an image from the gallery
         val fabNewImage: FloatingActionButton = findViewById(R.id.fab_new_image)
@@ -148,6 +183,96 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .build()
     }
 
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        Log.e("Location update", "Starting...")
+        //  start receiving the location update
+
+        val intent = Intent(ctx, LocationService::class.java)
+        mLocationPendingIntent =
+            PendingIntent.getService(ctx,
+                1,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+        Log.e("IntentService", "Getting...")
+
+//        Or call the startService() inside the lambda
+//        this was an implicit invocation in the code above
+//        Intent(ctx, LocationService::class.java).also { intent ->
+//            startService(intent)
+//            mLocationPendingIntent =
+//                PendingIntent.getService(ctx,
+//                    1,
+//                    intent,
+//                    PendingIntent.FLAG_UPDATE_CURRENT
+//                )
+//        }
+
+        val locationTask = fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            mLocationPendingIntent!!
+        )
+        locationTask.addOnFailureListener { e ->
+            if (e is ApiException) {
+                e.message?.let { Log.w("MapsActivity", it) }
+            } else {
+                Log.w("MapsActivity", e.message!!)
+            }
+        }
+        locationTask.addOnCompleteListener {
+            Log.d(
+                "MapsActivity",
+                "starting gps successful!"
+            )
+        }
+
+    }
+    private fun stopLocationUpdates() {
+        //  stop receiving the location update
+        Log.e("Location", "update stop")
+        fusedLocationClient.removeLocationUpdates(mLocationPendingIntent!!)
+    }
+
+    private var mLocationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            mCurrentLocation = locationResult.lastLocation
+            mLastUpdateTime = DateFormat.getTimeInstance().format(Date())
+//            Log.i("MAP", "new location " + mCurrentLocation.toString())
+            mMap.addMarker(
+                MarkerOptions().position(
+                    LatLng(
+                        mCurrentLocation!!.latitude,
+                        mCurrentLocation!!.longitude
+                    )
+                )
+                    .title(mLastUpdateTime)
+            )
+            mMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        mCurrentLocation!!.latitude,
+                        mCurrentLocation!!.longitude
+                    ), 14.0f
+                )
+            )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        locationRequest = LocationRequest.create()
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 5000
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        checkAndRequestPermissions()
+        startLocationUpdates()
+    }
+
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -173,8 +298,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    private fun setContext(context: Context) {
+        ctx = context
+    }
+
 
     companion object{
+        private var activity: AppCompatActivity? = null
+        private lateinit var mMap: GoogleMap
+
+        fun getActivity(): AppCompatActivity? {
+            return activity
+
+        }
+        fun setActivity(newActivity: AppCompatActivity) {
+            activity = newActivity
+        }
+        fun getMap(): GoogleMap {
+            return mMap
+        }
+
         private const val  PERMISSION_REQUEST_CODE = 1
     }
 

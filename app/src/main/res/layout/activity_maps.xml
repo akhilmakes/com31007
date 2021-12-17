@@ -14,16 +14,23 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_new_image"
         android:layout_width="wrap_content"
+<<<<<<< HEAD
         android:layout_height="100dp"
         android:layout_gravity="bottom"
         android:layout_margin="50dp"
+=======
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:translationY="-35dp"
+>>>>>>> views
         app:srcCompat="@android:drawable/ic_menu_gallery">
 
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
 
     <Button
         android:id="@+id/button_start"
