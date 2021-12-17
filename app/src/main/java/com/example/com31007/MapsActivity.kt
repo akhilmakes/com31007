@@ -26,16 +26,39 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import pl.aprilapps.easyphotopicker.*
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener, OnMyLocationClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var easyImage: EasyImage
 
     private lateinit var fusedLocationClient : FusedLocationProviderClient
-    private var requestingLocationUpdates: Boolean = true
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var locationRequest: LocationRequest
+
+
+
+    @SuppressLint("MissingPermission")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        checkAndRequestPermissions()
+
+
+
+        binding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        initEasyImage()
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        // Floating Action Button to select an image from the gallery
+        val fabNewImage: FloatingActionButton = findViewById(R.id.fab_new_image)
+        fabNewImage.setOnClickListener(){
+            easyImage.openChooser(this@MapsActivity)
+        }
+
+    }
 
 
     private fun hasLocationsPermissions() =
@@ -116,49 +139,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
 
 
 
-    @SuppressLint("MissingPermission")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        checkAndRequestPermissions()
 
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                super.onLocationResult(result)
-            }
-        }
-
-
-
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        initEasyImage()
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
-        // Floating Action Button to select an image from the gallery
-        val fabNewImage: FloatingActionButton = findViewById(R.id.fab_new_image)
-        fabNewImage.setOnClickListener(){
-            easyImage.openChooser(this)
-        }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (requestingLocationUpdates) startLocationUpdates()
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private fun startLocationUpdates() {
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-            locationCallback,
-            Looper.getMainLooper())
-    }
 
 
     private fun initEasyImage() {
@@ -186,8 +168,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
 
         mMap = googleMap
 
-        mMap.setOnMyLocationButtonClickListener(this)
-        mMap.setOnMyLocationClickListener(this)
 
 
         mMap.addMarker(MarkerOptions().position(lastPos).title("Last Position"))
@@ -195,19 +175,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButton
 
 
 
-    }
-
-
-
-    override fun onMyLocationButtonClick(): Boolean {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show()
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false
-    }
-
-    override fun onMyLocationClick(location: Location) {
-        Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG).show()
     }
 
 
