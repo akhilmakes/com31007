@@ -139,10 +139,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-
-
-
-
     private fun initEasyImage() {
         easyImage = EasyImage.Builder(this)
             .setChooserTitle("Pick media")
