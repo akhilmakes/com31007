@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.com31007.databinding.ActivityMapsBinding
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 import pl.aprilapps.easyphotopicker.*
@@ -290,8 +291,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
 
-
+        val polyline1 = mMap.addPolyline(
+            PolylineOptions()
+            .clickable(true)
+            .add(lastPos)) /* Not sure how this part is meant to work with poly-lines */
         mMap.addMarker(MarkerOptions().position(lastPos).title("Last Position"))
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastPos,10.0f))
 
 
