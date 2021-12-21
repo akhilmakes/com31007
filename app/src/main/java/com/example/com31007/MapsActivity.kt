@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -67,6 +69,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
         initEasyImage()
 
+        var actionBar = getSupportActionBar()
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true)
+        }
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -94,6 +103,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             easyImage.openChooser(this@MapsActivity)
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
 
@@ -157,6 +172,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.back_action ->{
+                startActivity(Intent(this, MainActivity::class.java))
+                return true
+            }
+        }
+        return super.onContextItemSelected(item)
     }
 
 
