@@ -97,49 +97,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun hasLocationsPermissions() =
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+    @SuppressLint("MissingPermission")
+    private fun checkpermission(){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
 
-    private fun hasBackgroundLocationPermissions() =
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
 
-    private fun hasWriteToStoragePermissions() =
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    ACCESS_FINE_LOCATION
+                )
 
-    private fun hasReadFromStoragePermissions() =
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-
-
-
-
-    private fun requestStoragePermissions(){
-        var storagePermissions = mutableListOf<String>()
-
-        if(hasWriteToStoragePermissions() != PackageManager.PERMISSION_GRANTED){
-            storagePermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+            return
         }
-        if(hasReadFromStoragePermissions() != PackageManager.PERMISSION_GRANTED){
-            storagePermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if(storagePermissions.isNotEmpty()){
-            ActivityCompat.requestPermissions(this, storagePermissions.toTypedArray(), 0)
-        }
-    }
-
-    private fun requestLocationPermissions() {
-
-        var locationPermissions  = mutableListOf<String>()
-
-        if(hasLocationsPermissions() != PackageManager.PERMISSION_GRANTED){
-            locationPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-        if(hasBackgroundLocationPermissions() != PackageManager.PERMISSION_GRANTED){
-            locationPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
-        if(locationPermissions.isNotEmpty()){
-            ActivityCompat.requestPermissions(this, locationPermissions.toTypedArray(), 1)
-        }
-
     }
 
 
@@ -168,10 +159,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun checkAndRequestPermissions(){
-        requestStoragePermissions()
-        requestLocationPermissions()
-    }
+
 
 
 
@@ -269,7 +257,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        checkAndRequestPermissions()
+        checkpermission()
         startLocationUpdates()
     }
 
