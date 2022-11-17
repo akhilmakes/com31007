@@ -1,4 +1,4 @@
-package com.example.com31007
+package com.example.week_5B_solution
 
 import org.junit.Test
 
