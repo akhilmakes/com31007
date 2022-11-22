@@ -23,7 +23,7 @@ class LocationService: Service() {
             if(result.lastLocation != null){
                 val lat = result.lastLocation!!.latitude
                 val long = result.lastLocation!!.longitude
-                Log.d("Location Service", "$lat, $long")
+                Log.d("LocationService", "$lat, $long")
             }
         }
     }
