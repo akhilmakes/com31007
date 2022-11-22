@@ -23,14 +23,30 @@
 
     <include layout="@layout/content_main"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/openGalleryFab"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end" android:layout_margin="16dp"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+    <Button
+        android:id="@+id/control_location_service_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:contentDescription="@string/control_location_description"
+        android:text="@string/start"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/openCamFab"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start" android:layout_margin="16dp"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openGalleryFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_menu_add"
+        android:contentDescription="@string/action_settings"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openCamFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_menu_camera"
+        android:contentDescription="@string/action_settings"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

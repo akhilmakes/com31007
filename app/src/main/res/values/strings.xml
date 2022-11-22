@@ -4,4 +4,7 @@
     <string name="title_activity_show_image">Image detail</string>
     <string name="delete">Delete</string>
     <string name="save">Update</string>
+    <string name="control_location_description">Start/Stop the Location Service</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>

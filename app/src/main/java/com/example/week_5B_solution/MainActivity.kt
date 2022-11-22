@@ -2,6 +2,9 @@ package com.example.week_5B_solution
 
 
 import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -10,10 +13,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -137,10 +142,70 @@ class MainActivity : AppCompatActivity() {
             pickFromCamera.launch(intent)
         })
 
+        val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
+
+        controlLocationBtn.setOnClickListener{ button ->
+
+            if(controlLocationBtn.text == getString(R.string.start)) {
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != GRANTED){
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION_PERMISSION)
+                } else {
+                    controlLocationBtn.text  = getString(R.string.stop)
+                    startLocationService()
+                }
+
+            } else if (controlLocationBtn.text == getString(R.string.stop)) {
+                controlLocationBtn.text = getString(R.string.start)
+                stopLocationService()
+            }
+
+        }
+
+
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 this, MainActivity.REQUIRED_PERMISSIONS, MainActivity.REQUEST_CODE_PERMISSIONS
             )
+        }
+    }
+
+    private fun isLocationServiceRunning(): Boolean {
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
+            if(LocationService::class.java.name.equals(service.service.className)){
+                if(service.foreground) return true
+            }
+        }
+        return false
+
+    }
+
+
+    private fun startLocationService() {
+        if(!isLocationServiceRunning()){
+            val intent = Intent(
+                applicationContext,
+                LocationService::class.java
+            ).setAction(LocationService.ACTION_START)
+            startService(intent)
+            Toast.makeText(this, "Starting Location Tracking", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopLocationService() {
+        if(isLocationServiceRunning()){
+            val intent = Intent(
+                applicationContext,
+                LocationService::class.java
+            ).setAction(LocationService.ACTION_STOP)
+            startService(intent)
+            Toast.makeText(this, "Stopping Location Tracking", Toast.LENGTH_SHORT).show()
+
         }
     }
 
@@ -254,6 +319,9 @@ class MainActivity : AppCompatActivity() {
         const val TAG = R.string.app_name.toString()
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         const val REQUEST_CODE_PERMISSIONS = 10
+        const val REQUEST_CODE_LOCATION_PERMISSION = 1
+
+        const val GRANTED = PackageManager.PERMISSION_GRANTED
 
         val REQUIRED_PERMISSIONS =
             mutableListOf (
