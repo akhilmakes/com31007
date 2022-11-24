@@ -147,7 +147,7 @@ class ShowImageActivity : AppCompatActivity() {
                 daoObj.update(MyAdapter.items[position])
 
                 // Start an intent to to tell the calling activity an update happened.
-                val intent = Intent(this@ShowImageActivity, MainActivity::class.java)
+                val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
                 intent.putExtra("updated",true)
                 setResult(RESULT_OK,intent)
                 finish()
@@ -167,7 +167,7 @@ class ShowImageActivity : AppCompatActivity() {
                 MyAdapter.items.removeAt(position)
 
                 // Start an intent to let the caller know deletion happened and which item was deleted.
-                val intent = Intent(this@ShowImageActivity, MainActivity::class.java)
+                val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
                 intent.putExtra("deletion",true)
                 intent.putExtra("position",position)
                 setResult(RESULT_OK,intent)

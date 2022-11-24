@@ -14,19 +14,28 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class LocationService: Service() {
 
-    private var locationCallback = object : LocationCallback() {
+
+    val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
             if(result.lastLocation != null){
                 val lat = result.lastLocation!!.latitude
                 val long = result.lastLocation!!.longitude
+
                 Log.d("LocationService", "$lat, $long")
+
+
             }
         }
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("UnspecifiedImmutableFlag", "MissingPermission")
@@ -67,6 +76,8 @@ class LocationService: Service() {
 
             }
         }
+
+
         val locationRequest = LocationRequest.Builder(4000)
             .setMinUpdateIntervalMillis(2000)
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
@@ -115,5 +126,6 @@ class LocationService: Service() {
         val LOCATION_SERVICE_ID = 175
         val ACTION_START = "startActionService"
         val ACTION_STOP = "stopActionService"
+        
     }
 }

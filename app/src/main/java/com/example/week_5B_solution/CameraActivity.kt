@@ -14,7 +14,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import com.example.week_5B_solution.MainActivity.Companion.FILENAME_FORMAT
+import com.example.week_5B_solution.GalleryActivity.Companion.FILENAME_FORMAT
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,7 +56,7 @@ class CameraActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) { //P is API 28
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${MainActivity.TAG}")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${GalleryActivity.TAG}")
             }
         }
 
@@ -74,14 +74,14 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e(MainActivity.TAG, "Photo capture failed: ${exc.message}", exc)
+                    Log.e(GalleryActivity.TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults){
                     val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Log.d(MainActivity.TAG, msg)
+                    Log.d(GalleryActivity.TAG, msg)
 
-                    val intent = Intent(this@CameraActivity, MainActivity::class.java)
+                    val intent = Intent(this@CameraActivity, GalleryActivity::class.java)
                     intent.putExtra("uri",output.savedUri.toString())
                     setResult(RESULT_OK,intent)
                     finish()
@@ -122,7 +122,7 @@ class CameraActivity : AppCompatActivity() {
                     this, cameraSelector, preview, imageCapture)
 
             } catch(exc: Exception) {
-                Log.e(MainActivity.TAG, "Use case binding failed", exc)
+                Log.e(GalleryActivity.TAG, "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))

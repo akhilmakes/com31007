@@ -141,7 +141,7 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // onClick listener added to each item in the ViewHolder
         holder.itemView.setOnClickListener(View.OnClickListener {
             // the listener is implemented in MainActivity
-            (context as MainActivity).onViewHolderItemClick(position)
+            (context as GalleryActivity).onViewHolderItemClick(position)
         })
     }
 
