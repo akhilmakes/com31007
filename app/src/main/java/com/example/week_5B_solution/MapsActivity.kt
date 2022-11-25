@@ -60,6 +60,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
+                    val lat = LocationService.currentLocation?.latitude
+                    val long = LocationService.currentLocation?.longitude
+
+
+
+                    if (lat != null && long != null){
+                        mMap.addMarker(MarkerOptions()
+                            .position(LatLng(lat, long))
+                        )
+
+                    }
+
                 }
 
             } else if (controlLocationBtn.text == getString(R.string.stop)) {

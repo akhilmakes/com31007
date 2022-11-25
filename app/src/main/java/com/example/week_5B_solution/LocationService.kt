@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
@@ -15,24 +16,27 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 
 class LocationService: Service() {
 
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            super.onLocationResult(result)
-            if(result.lastLocation != null){
-                val lat = result.lastLocation!!.latitude
-                val long = result.lastLocation!!.longitude
-
-                Log.d("LocationService", "$lat, $long")
+    private lateinit var locationClient: LocationClient
 
 
-            }
-        }
+    override fun onCreate() {
+        super.onCreate()
+
+         locationClient = LocationClient(
+            applicationContext,
+            LocationServices.getFusedLocationProviderClient(applicationContext)
+        )
     }
 
 
@@ -40,6 +44,7 @@ class LocationService: Service() {
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("UnspecifiedImmutableFlag", "MissingPermission")
     private fun startLocationService(){
+
         val channelID = "location_notification_channel"
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -57,7 +62,7 @@ class LocationService: Service() {
         ).setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Location Service")
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setContentText("Running")
+            .setContentText("Location: null, null")
             .setContentIntent(pendingIntent)
             .setAutoCancel(false)
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -77,29 +82,37 @@ class LocationService: Service() {
             }
         }
 
+         locationClient.receiveLocationUpdates(5000)
+            .catch { e -> e.printStackTrace() }
+            .onEach{ location ->
+                val lat = location.latitude
+                val long = location.longitude
 
-        val locationRequest = LocationRequest.Builder(4000)
-            .setMinUpdateIntervalMillis(2000)
-            .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+                currentLocation = location
 
-        LocationServices.getFusedLocationProviderClient(this)
-            .requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
+                val updatedNotification = builder.setContentText("Location: $lat, $long")
+
+                notificationManager.notify(LOCATION_SERVICE_ID, updatedNotification.build())
+
+            }
+            .launchIn(serviceScope)
 
         startForeground(LOCATION_SERVICE_ID, builder.build())
 
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun stopLocationService(){
-        LocationServices.getFusedLocationProviderClient(this)
-            .removeLocationUpdates(locationCallback)
         stopForeground(LOCATION_SERVICE_ID)
         stopSelf()
     }
+
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -126,6 +139,8 @@ class LocationService: Service() {
         val LOCATION_SERVICE_ID = 175
         val ACTION_START = "startActionService"
         val ACTION_STOP = "stopActionService"
-        
+
+        var currentLocation: Location? = null
+
     }
 }
