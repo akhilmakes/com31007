@@ -61,6 +61,15 @@
             android:layout_marginBottom="4dp"
             android:ems="10"
             android:text="Tag"
+            app:layout_constraintBottom_toTopOf="@+id/editText_latlong" />
+
+        <EditText
+            android:id="@+id/editText_latlong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:ems="10"
+            android:text="latlong"
             app:layout_constraintBottom_toTopOf="@+id/textView_location" />
 
         <TextView

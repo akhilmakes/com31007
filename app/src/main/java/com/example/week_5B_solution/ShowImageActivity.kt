@@ -1,7 +1,10 @@
 package com.example.week_5B_solution
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
+import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,6 +19,7 @@ import com.example.week_5B_solution.databinding.ActivityShowImageBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.exifinterface.media.ExifInterface
 
 class ShowImageActivity : AppCompatActivity() {
 
@@ -44,6 +48,13 @@ class ShowImageActivity : AppCompatActivity() {
                 MyAdapter.items[position].description?.isNotEmpty().apply {
                     binding.editTextDescription.setText(MyAdapter.items[position].description)
                 }
+                val exif = ExifInterface(MyAdapter.items[position].imagePath)
+               // exif.latLong?.get(0) // latitude
+               // exif.latLong?.get(1) // longitude
+                val lat = exif.latLong?.get(0)
+                val long = exif.latLong?.get(1)
+                binding.editTextLatlong.setText("$lat, $long")
+
 
                 // onClick listener for the update button
                 binding.buttonSave.setOnClickListener {
@@ -175,4 +186,16 @@ class ShowImageActivity : AppCompatActivity() {
             }
         }
     }
+    @SuppressLint("Range")
+    fun uri2path(context: Context, contentUri: Uri): String? {
+        val proj = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor: Cursor? = context.contentResolver.query(contentUri, proj, null, null, null)
+        cursor?.moveToNext()
+        val path = cursor?.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA))
+        val uri = Uri.fromFile(File(path))
+        cursor?.close()
+        return path
+    }
+
+
 }
