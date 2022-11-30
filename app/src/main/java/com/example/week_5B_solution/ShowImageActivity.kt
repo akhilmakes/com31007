@@ -5,6 +5,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,7 +20,6 @@ import com.example.week_5B_solution.databinding.ActivityShowImageBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import java.io.File
-import androidx.exifinterface.media.ExifInterface
 
 class ShowImageActivity : AppCompatActivity() {
 
