@@ -107,7 +107,7 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
-         initData()
+        initData()
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
 
@@ -190,11 +190,6 @@ class GalleryActivity : AppCompatActivity() {
     //region other (custom/utility) functions
 
     private fun initData() {
-//        repeat(10){
-//            myDataset.add(ImageElement(R.drawable.joe1))
-//            myDataset.add(ImageElement(R.drawable.joe2))
-//            myDataset.add(ImageElement(R.drawable.joe3))
-//        }
         daoObj = (this@GalleryActivity.application as ImageApplication)
             .databaseObj.imageDataDao()
         runBlocking {

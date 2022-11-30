@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
@@ -13,6 +14,10 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.week_5B_solution.data.ImageData
+import com.example.week_5B_solution.data.ImageDataDao
+import com.example.week_5B_solution.data.LatData
+import com.example.week_5B_solution.data.LatDataDao
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -22,15 +27,63 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var imagedaoObj: ImageDataDao
+    private lateinit var latdaoObj: LatDataDao
+    // private var myImageDataset: MutableList<ImageData> = ArrayList<ImageData>()
+    var myLatDataset: MutableList<LatData> = ArrayList<LatData>()
+
+
+
+    private fun initData() {
+//        imagedaoObj = (this@MapsActivity.application as ImageApplication)
+//            .databaseObj.imageDataDao()
+        latdaoObj = (this@MapsActivity.application as ImageApplication)
+            .databaseObj.latDataDao()
+        // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
+        runBlocking {
+            launch(Dispatchers.Default) {
+                // myImageDataset.addAll(imagedaoObj.getItems())
+                myLatDataset.addAll(latdaoObj.getLatLng())
+                Log.d("TREE", myLatDataset.toString())
+            }
+        }
+    }
+
+    //[lat, lng]
+    private suspend fun initNewLatData(data: MutableList<LatData>): LatData {
+
+        var latData = LatData(
+            lat = data[0].toString().toDouble(),
+            lng = data[1].toString().toDouble()
+        )
+        latdaoObj?.let {
+            coroutineScope{
+                val insertJob = async(Dispatchers.IO){
+                    // Insert the newly created ImageData entity
+                    latdaoObj.insert(latData)
+                }
+
+                val rowId = insertJob.await().toString().toInt()
+
+                // Using the rowId, retrieve the ImageData object from db,
+                // or just update the id in the existing object
+                // imageData.id = rowId
+                val retrieveJob = async(Dispatchers.IO) {
+                    latdaoObj.getItem(rowId)
+                }
+                latData = retrieveJob.await()
+
+            }
+        }
+        return latData
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +91,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+
+        initData()
+
+        myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -69,6 +128,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         mMap.addMarker(MarkerOptions()
                             .position(LatLng(lat, long))
                         )
+
+                        lateinit var latData: MutableList<LatData>
+                        runBlocking {
+                            launch{
+                                initNewLatData(latData(lat,long))
+                            }
+                        }
+                        // myLatDataset.add(latData)
 
                     }
 

@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [ImageData::class], version = 1, exportSchema = false)
+@Database(entities = [ImageData::class, LatData::class], version = 1, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun imageDataDao(): ImageDataDao
+    abstract fun latDataDao(): LatDataDao
 
     companion object{
         private val DATABASE_NAME = "Lab5Db"
