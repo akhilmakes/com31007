@@ -19,7 +19,12 @@ class LocationClient(
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
-
+    /**
+     * fun receiveLocationUpdates()
+     * this function returns a callbackFlow which is sent the location that is retrieved by requesting
+     * location updates from the FusedLocationProviderClient within tne LocationCallback. Once the
+     * scope is closed the location updates are removed.
+     */
     @SuppressLint("MissingPermission")
     fun receiveLocationUpdates(interval: Long): Flow<Location>{
         return callbackFlow {

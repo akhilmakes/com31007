@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -46,6 +47,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
+        /*
+        * controlLocationBtn is assigned an onClickListener to start the location service if the
+        * permissions are granted, otherwise it will request permissions. If the button has text
+        * 'Start' then it will change to 'Stop' and vice versa.
+        * */
         controlLocationBtn.setOnClickListener{ button ->
 
             if(controlLocationBtn.text == getString(R.string.start)) {
@@ -60,17 +66,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
-                    val lat = LocationService.currentLocation?.latitude
-                    val long = LocationService.currentLocation?.longitude
-
-
-
-                    if (lat != null && long != null){
-                        mMap.addMarker(MarkerOptions()
-                            .position(LatLng(lat, long))
-                        )
-
-                    }
 
                 }
 
@@ -88,7 +83,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
     }
-
+    /*
+    * function: isLocationServiceRunning()
+    * Checks the running services to return true or false if the location service
+    * is running.
+    */
     private fun isLocationServiceRunning(): Boolean {
 
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -102,6 +101,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    /*
+    * function: startLocationService()
+    * Creates an Intent to start the location service and its corresponding action, and displays
+    * a Toast to notify the service has been started.
+    */
     private fun startLocationService() {
         if(!isLocationServiceRunning()){
             val intent = Intent(
@@ -113,6 +117,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /*
+    * function: stopLocationService()
+    * Creates an Intent to stop the location service and its corresponding action, and displays
+    * a Toast to notify the service has been stopped.
+    */
     private fun stopLocationService() {
         if(isLocationServiceRunning()){
             val intent = Intent(
