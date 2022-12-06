@@ -46,43 +46,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //            .databaseObj.imageDataDao()
         latdaoObj = (this@MapsActivity.application as ImageApplication)
             .databaseObj.latDataDao()
-        // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
-        runBlocking {
-            launch(Dispatchers.Default) {
-                // myImageDataset.addAll(imagedaoObj.getItems())
-                myLatDataset.addAll(latdaoObj.getLatLng())
-                Log.d("TREE", myLatDataset.toString())
-            }
-        }
+//        runBlocking {
+//            launch(Dispatchers.Default) {
+//                // myImageDataset.addAll(imagedaoObj.getItems())
+//                myLatDataset.addAll(latdaoObj.getLatLng())
+//            }
+//        }
     }
 
-    //[lat, lng]
-    private suspend fun initNewLatData(data: MutableList<LatData>): LatData {
+    // [lat, lng]
+    private suspend fun initNewLatData(lat:Double, lng:Double) {
 
         var latData = LatData(
-            lat = data[0].toString().toDouble(),
-            lng = data[1].toString().toDouble()
+            lat = lat,
+            lng = lng
         )
         latdaoObj?.let {
             coroutineScope{
-                val insertJob = async(Dispatchers.IO){
-                    // Insert the newly created ImageData entity
+                async(Dispatchers.IO){
                     latdaoObj.insert(latData)
                 }
 
-                val rowId = insertJob.await().toString().toInt()
-
-                // Using the rowId, retrieve the ImageData object from db,
-                // or just update the id in the existing object
-                // imageData.id = rowId
-                val retrieveJob = async(Dispatchers.IO) {
-                    latdaoObj.getItem(rowId)
-                }
-                latData = retrieveJob.await()
-
             }
         }
-        return latData
+        // return latData
     }
 
 
@@ -92,11 +79,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         initData()
 
-        myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
+        // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -129,14 +115,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             .position(LatLng(lat, long))
                         )
 
-                        lateinit var latData: MutableList<LatData>
+                        // store data when "Start"
                         runBlocking {
                             launch{
-                                initNewLatData(latData(lat,long))
+                                initNewLatData(lat, long)
                             }
                         }
-                        // myLatDataset.add(latData)
-
                     }
 
                 }
