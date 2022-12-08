@@ -34,10 +34,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var imagedaoObj: ImageDataDao
+    // private lateinit var imagedaoObj: ImageDataDao
     private lateinit var latdaoObj: LatDataDao
     // private var myImageDataset: MutableList<ImageData> = ArrayList<ImageData>()
     var myLatDataset: MutableList<LatData> = ArrayList<LatData>()
+    var pathNum = 1
 
 
 
@@ -55,11 +56,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // [lat, lng]
-    private suspend fun initNewLatData(lat:Double, lng:Double) {
+    private suspend fun initNewLatData(lat:Double, lng:Double, pathNum:Int) {
 
         var latData = LatData(
             lat = lat,
-            lng = lng
+            lng = lng,
+            pathNum = pathNum
         )
         latdaoObj?.let {
             coroutineScope{
@@ -82,7 +84,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         initData()
 
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -118,7 +119,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // store data when "Start"
                         runBlocking {
                             launch{
-                                initNewLatData(lat, long)
+                                initNewLatData(lat, long, pathNum)
                             }
                         }
                     }
@@ -127,7 +128,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             } else if (controlLocationBtn.text == getString(R.string.stop)) {
                 controlLocationBtn.text = getString(R.string.start)
+                val lat = LocationService.currentLocation!!.latitude
+                val long = LocationService.currentLocation!!.longitude
+                runBlocking {
+                    launch {
+                        initNewLatData(lat, long, pathNum)
+                    }
+                }
                 stopLocationService()
+                pathNum++
             }
 
         }

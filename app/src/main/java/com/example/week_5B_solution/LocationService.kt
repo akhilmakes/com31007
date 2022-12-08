@@ -82,7 +82,7 @@ class LocationService: Service() {
             }
         }
 
-         locationClient.receiveLocationUpdates(5000)
+         locationClient.receiveLocationUpdates(20000)
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
                 val lat = location.latitude

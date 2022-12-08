@@ -16,8 +16,8 @@ interface LatDataDao {
     @Query("Select * from latlng Where id = :id")
     suspend fun getItem(id: Int): LatData
 
-    @Query("Select lat, lng from latlng where pathNum = :pathNum")
-    suspend fun getPath(pathNum: Int)
+    @Query("Select * from latlng Where pathNum = :pathNum")
+    suspend fun getPath(pathNum: Int) : List<LatData>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(latData: LatData)
