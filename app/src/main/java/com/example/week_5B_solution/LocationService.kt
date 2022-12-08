@@ -37,6 +37,8 @@ class LocationService: Service() {
 
     private lateinit var latdaoObj: LatDataDao
 
+    private var pathNumber = 1
+
     private fun initData() {
         latdaoObj = (this@LocationService.application as ImageApplication)
             .databaseObj.latDataDao()
@@ -44,12 +46,12 @@ class LocationService: Service() {
     }
 
     // [lat, lng]
-    private suspend fun initNewLatData(lat:Double, lng:Double) {
+    private suspend fun initNewLatData(lat:Double, lng:Double, path: Int) {
 
         var latData = LatData(
             lat = lat,
             lng = lng,
-            // pathNum = 1
+            pathNum = path
         )
         latdaoObj?.let {
             coroutineScope{
@@ -121,7 +123,7 @@ class LocationService: Service() {
                 val lat = location.latitude
                 val long = location.longitude
 
-                initNewLatData(lat, long)
+                initNewLatData(lat, long, pathNumber)
 
                 currentLocation = location
 
@@ -144,6 +146,7 @@ class LocationService: Service() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun stopLocationService(){
+        pathNumber++
         stopForeground(LOCATION_SERVICE_ID)
         stopSelf()
     }

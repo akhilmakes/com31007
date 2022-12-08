@@ -36,6 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var latdaoObj: LatDataDao
     var myLatDataset: MutableList<LatData> = ArrayList<LatData>()
+    private var pathNumber = 1
 
 
 
@@ -114,12 +115,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             .position(LatLng(lat, long))
                         )
 
-                        // store data when "Start"
-                        runBlocking {
-                            launch{
-                                initNewLatData(lat, long)
-                            }
-                        }
+//                        // store data when "Start"
+//                        runBlocking {
+//                            launch{
+//
+//                                initNewLatData(lat, long, pathNumber)
+//                            }
+//                        }
                     }
 
                 }
@@ -128,15 +130,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 controlLocationBtn.text = getString(R.string.start)
                 val lat = LocationService.currentLocation!!.latitude
                 val long = LocationService.currentLocation!!.longitude
-                var pathNum = latdaoObj.getLastPathNum()
 
-                runBlocking {
-                    launch {
-                        initNewLatData(lat, long,pathNum)
-                    }
-                }
+//                runBlocking {
+//                    launch {
+//                        initNewLatData(lat, long,pathNumber)
+//                    }
+//                }
                 stopLocationService()
-                pathNum++
+//                pathNumber++
             }
 
         }
