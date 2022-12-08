@@ -34,11 +34,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    // private lateinit var imagedaoObj: ImageDataDao
     private lateinit var latdaoObj: LatDataDao
-    // private var myImageDataset: MutableList<ImageData> = ArrayList<ImageData>()
     var myLatDataset: MutableList<LatData> = ArrayList<LatData>()
-    var pathNum = 1
+
 
 
 
@@ -119,7 +117,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // store data when "Start"
                         runBlocking {
                             launch{
-                                initNewLatData(lat, long, pathNum)
+                                initNewLatData(lat, long)
                             }
                         }
                     }
@@ -130,9 +128,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 controlLocationBtn.text = getString(R.string.start)
                 val lat = LocationService.currentLocation!!.latitude
                 val long = LocationService.currentLocation!!.longitude
+                var pathNum = latdaoObj.getLastPathNum()
+
                 runBlocking {
                     launch {
-                        initNewLatData(lat, long, pathNum)
+                        initNewLatData(lat, long,pathNum)
                     }
                 }
                 stopLocationService()

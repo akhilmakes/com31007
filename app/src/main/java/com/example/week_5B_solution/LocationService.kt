@@ -1,6 +1,7 @@
 package com.example.week_5B_solution
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -14,20 +15,51 @@ import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.example.week_5B_solution.data.LatData
+import com.example.week_5B_solution.data.LatDataDao
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+
+
+
+
+
+
 
 class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private lateinit var locationClient: LocationClient
+
+    private lateinit var latdaoObj: LatDataDao
+
+    private fun initData() {
+        latdaoObj = (this@LocationService.application as ImageApplication)
+            .databaseObj.latDataDao()
+
+    }
+
+    // [lat, lng]
+    private suspend fun initNewLatData(lat:Double, lng:Double) {
+
+        var latData = LatData(
+            lat = lat,
+            lng = lng,
+            // pathNum = 1
+        )
+        latdaoObj?.let {
+            coroutineScope{
+                async(Dispatchers.IO){
+                    latdaoObj.insert(latData)
+                }
+
+            }
+        }
+    }
 
 
     override fun onCreate() {
@@ -81,12 +113,15 @@ class LocationService: Service() {
 
             }
         }
+        initData()
 
          locationClient.receiveLocationUpdates(20000)
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
                 val lat = location.latitude
                 val long = location.longitude
+
+                initNewLatData(lat, long)
 
                 currentLocation = location
 
