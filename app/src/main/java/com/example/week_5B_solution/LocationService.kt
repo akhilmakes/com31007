@@ -15,6 +15,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.example.week_5B_solution.data.AppDatabase
 import com.example.week_5B_solution.data.LatData
 import com.example.week_5B_solution.data.LatDataDao
 import com.google.android.gms.location.*
@@ -25,43 +26,22 @@ import kotlinx.coroutines.flow.*
 
 
 
-
-
-
-
 class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private lateinit var locationClient: LocationClient
 
-    private lateinit var latdaoObj: LatDataDao
+    private var dbLatDataDao: LatDataDao? = null
 
-    private var pathNumber = 1
+    init {
 
-    private fun initData() {
-        latdaoObj = (this@LocationService.application as ImageApplication)
+        dbLatDataDao = (this@LocationService.application as ImageApplication)
             .databaseObj.latDataDao()
 
     }
 
-    // [lat, lng]
-    private suspend fun initNewLatData(lat:Double, lng:Double, path: Int) {
 
-        var latData = LatData(
-            lat = lat,
-            lng = lng,
-            pathNum = path
-        )
-        latdaoObj?.let {
-            coroutineScope{
-                async(Dispatchers.IO){
-                    latdaoObj.insert(latData)
-                }
-
-            }
-        }
-    }
 
 
     override fun onCreate() {
@@ -115,7 +95,7 @@ class LocationService: Service() {
 
             }
         }
-        initData()
+
 
          locationClient.receiveLocationUpdates(20000)
             .catch { e -> e.printStackTrace() }
@@ -123,9 +103,7 @@ class LocationService: Service() {
                 val lat = location.latitude
                 val long = location.longitude
 
-                initNewLatData(lat, long, pathNumber)
-
-                currentLocation = location
+                dbLatDataDao!!.insert(LatData(lat = lat, lng = long, pathNum = 1))
 
                 val updatedNotification = builder.setContentText("Location: $lat, $long")
 
@@ -136,7 +114,6 @@ class LocationService: Service() {
 
         startForeground(LOCATION_SERVICE_ID, builder.build())
 
-
     }
 
     override fun onDestroy() {
@@ -146,7 +123,6 @@ class LocationService: Service() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun stopLocationService(){
-        pathNumber++
         stopForeground(LOCATION_SERVICE_ID)
         stopSelf()
     }

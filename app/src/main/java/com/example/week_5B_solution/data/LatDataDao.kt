@@ -1,5 +1,6 @@
 package com.example.week_5B_solution.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,7 +11,7 @@ import androidx.room.Update
 @Dao
 interface LatDataDao {
     @Query("Select * from latlng")
-    suspend fun getLatLng(): List<LatData>
+    fun getLatLng(): LiveData<LatData>?
 
     // Useful for tracking Entities
     @Query("Select * from latlng Where id = :id")

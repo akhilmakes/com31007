@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.data.ImageData
 import com.example.week_5B_solution.data.ImageDataDao
 import com.example.week_5B_solution.data.LatData
@@ -30,48 +31,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var latdaoObj: LatDataDao
-    var myLatDataset: MutableList<LatData> = ArrayList<LatData>()
-    private var pathNumber = 1
 
+    private var locationViewModel: LocationViewModel? = null
 
-
-
-    private fun initData() {
-//        imagedaoObj = (this@MapsActivity.application as ImageApplication)
-//            .databaseObj.imageDataDao()
-        latdaoObj = (this@MapsActivity.application as ImageApplication)
-            .databaseObj.latDataDao()
-//        runBlocking {
-//            launch(Dispatchers.Default) {
-//                // myImageDataset.addAll(imagedaoObj.getItems())
-//                myLatDataset.addAll(latdaoObj.getLatLng())
-//            }
-//        }
-    }
-
-    // [lat, lng]
-    private suspend fun initNewLatData(lat:Double, lng:Double, pathNum:Int) {
-
-        var latData = LatData(
-            lat = lat,
-            lng = lng,
-            pathNum = pathNum
-        )
-        latdaoObj?.let {
-            coroutineScope{
-                async(Dispatchers.IO){
-                    latdaoObj.insert(latData)
-                }
-
-            }
-        }
-        // return latData
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +46,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initData()
+        this.locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
+
 
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
 
@@ -105,39 +72,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
-                    val lat = LocationService.currentLocation?.latitude
-                    val long = LocationService.currentLocation?.longitude
 
+                    val latData = this.locationViewModel!!.getLatDataToDisplay().value
 
-
-                    if (lat != null && long != null){
-                        mMap.addMarker(MarkerOptions()
-                            .position(LatLng(lat, long))
-                        )
-
-//                        // store data when "Start"
-//                        runBlocking {
-//                            launch{
-//
-//                                initNewLatData(lat, long, pathNumber)
-//                            }
-//                        }
+                    if (latData != null){
+                        val latLng = LatLng(latData.lat, latData.lng)
+                        mMap.addMarker(MarkerOptions().position(latLng))
                     }
 
                 }
 
             } else if (controlLocationBtn.text == getString(R.string.stop)) {
                 controlLocationBtn.text = getString(R.string.start)
-                val lat = LocationService.currentLocation!!.latitude
-                val long = LocationService.currentLocation!!.longitude
-
-//                runBlocking {
-//                    launch {
-//                        initNewLatData(lat, long,pathNumber)
-//                    }
-//                }
                 stopLocationService()
-//                pathNumber++
             }
 
         }
@@ -185,6 +132,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         }
     }
+
+
 
 
     /**

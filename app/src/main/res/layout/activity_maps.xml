@@ -12,7 +12,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MapsActivity"/>
+        tools:context=".MapActivity"/>
 
     <Button
         android:id="@+id/control_location_service_btn"
