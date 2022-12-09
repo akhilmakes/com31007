@@ -28,20 +28,14 @@ class LocationService: Service() {
 
     private lateinit var locationClient: LocationClient
 
-    private var dbLatDataDao: LatDataDao? = null
-
-    init {
-
-        dbLatDataDao = (this@LocationService.application as ImageApplication)
-            .databaseObj.latDataDao()
-
-    }
-
+    private lateinit var dbLatDataDao: LatDataDao
 
 
 
     override fun onCreate() {
         super.onCreate()
+
+        initDataDao()
 
          locationClient = LocationClient(
             applicationContext,
@@ -143,6 +137,11 @@ class LocationService: Service() {
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
+    }
+
+    private fun initDataDao(){
+        dbLatDataDao = (this@LocationService.application as ImageApplication)
+            .databaseObj.latDataDao()
     }
 
     companion object{

@@ -45,6 +45,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".model.LocationService"
+            android:foregroundServiceType="location"/>
 
         <activity
             android:name=".CameraActivity"
