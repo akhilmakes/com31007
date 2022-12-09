@@ -1,7 +1,6 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.model
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -11,17 +10,14 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
-import android.os.Looper
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.example.week_5B_solution.data.AppDatabase
+import com.example.week_5B_solution.ImageApplication
+import com.example.week_5B_solution.R
 import com.example.week_5B_solution.data.LatData
 import com.example.week_5B_solution.data.LatDataDao
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
 

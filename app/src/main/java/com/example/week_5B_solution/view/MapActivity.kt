@@ -1,24 +1,21 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.data.ImageData
-import com.example.week_5B_solution.data.ImageDataDao
-import com.example.week_5B_solution.data.LatData
-import com.example.week_5B_solution.data.LatDataDao
+import com.example.week_5B_solution.GalleryActivity
+import com.example.week_5B_solution.model.LocationService
+import com.example.week_5B_solution.viewmodel.LocationViewModel
+import com.example.week_5B_solution.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -29,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 

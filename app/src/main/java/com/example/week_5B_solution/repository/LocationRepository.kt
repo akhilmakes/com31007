@@ -1,22 +1,14 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.repository
 
 import android.app.Application
-import android.content.Context
-import android.content.Intent
-import android.location.Location
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.week_5B_solution.data.AppDatabase
+import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.data.LatData
 import com.example.week_5B_solution.data.LatDataDao
-import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.net.ssl.ManagerFactoryParameters
 
 class LocationRepository(application: Application) {
     private var dbLatDataDao: LatDataDao? = null

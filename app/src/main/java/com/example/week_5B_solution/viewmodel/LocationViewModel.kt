@@ -1,14 +1,12 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.viewmodel
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import com.example.week_5B_solution.repository.LocationRepository
 import com.example.week_5B_solution.data.LatData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class LocationViewModel(application: Application): AndroidViewModel(application) {
 
