@@ -13,11 +13,12 @@ import androidx.room.PrimaryKey
                 childColumns = ["pathID"],
                 onDelete = ForeignKey.CASCADE
             )]
+
 )
 data class LatLngData(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name="lat") val lat: Double,
     @ColumnInfo(name="lng") val lng: Double,
-    @ColumnInfo(name="pathID") var pathID: Int?
+    @ColumnInfo(name="pathID") var pathID: Int?,
     )
 { }

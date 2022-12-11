@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.week_5B_solution" >
+    package="com.example.week_5B_solution">
 
     <uses-feature android:name="android.hardware.camera.any" />
 
@@ -12,11 +12,9 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
 
     <application
         android:name=".ImageApplication"
@@ -28,8 +26,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Week_4_solution"
-        tools:targetApi="31" >
-
+        tools:targetApi="31">
+        <activity
+            android:name=".PathDetailActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -46,12 +50,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".model.LocationService"
-            android:foregroundServiceType="location"/>
+        <service
+            android:name=".model.LocationService"
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".CameraActivity"
-            android:exported="false" >
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -62,9 +67,7 @@
             android:label="@string/title_activity_show_image" />
         <activity
             android:name=".GalleryActivity"
-            android:exported="true" >
-
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>
