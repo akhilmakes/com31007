@@ -1,12 +1,7 @@
 package com.example.week_5B_solution.data
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 
 @Dao
 interface LatLngDataDao {
@@ -26,6 +21,10 @@ interface LatLngDataDao {
     // Useful for tracking Entities
     @Query("Select * from latlng Where id = :id")
     suspend fun getItem(id: Int): LatLngData
+
+
+    @Query("select * from latlng A LEFT JOIN path B On pathID = pathID group by pathID")
+    fun getOnePathData(): LiveData<List<LocationTitle>>
 
 
 

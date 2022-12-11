@@ -14,9 +14,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.GalleryActivity
+import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.model.LocationService
 import com.example.week_5B_solution.viewmodel.LocationViewModel
 import com.example.week_5B_solution.R
+import com.example.week_5B_solution.data.LatLngDataDao
+import com.example.week_5B_solution.data.PathDao
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,6 +38,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var locationViewModel: LocationViewModel? = null
 
+    private lateinit var dbLatLngDataDao: LatLngDataDao
+    private lateinit var dbPathDao : PathDao
+
+    private fun initDataDao(){
+        dbLatLngDataDao = (this@MapActivity.application as ImageApplication)
+            .databaseObj.latLngDataDao()
+        dbPathDao = (this@MapActivity.application as ImageApplication)
+                .databaseObj.pathDao()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +57,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
 
-
+        initDataDao()
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -125,6 +138,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun returnPath() {
+
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -143,9 +160,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
+       var markerList = dbLatLngDataDao.getOnePathData()
+
+        markerList.observe(this,{
+            value ->
+           for (i in value){
+               Log.d("Marker", i.toString())
+               //Log.d("Marker", i.title.toString())
+//               Log.d("Marker", i.lng.toString())
+//               Log.d("Marker", i.pathID.toString())
+               mMap.addMarker(MarkerOptions()
+                   .position(LatLng(i.lat, i.lng))
+                   .title(i.title))
+           }
+        })
+
+
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
     }
 }
