@@ -43,8 +43,6 @@ class LocationRepository(application: Application) {
     }
 
 
-
-
     fun getPathNum(): Int {
         return dbPathDao!!.getLatestPathNum()
     }

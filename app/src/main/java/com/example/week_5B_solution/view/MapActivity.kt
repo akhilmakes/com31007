@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -57,14 +58,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         controlLocationBtn.setOnClickListener{ button ->
 
             if(controlLocationBtn.text == getString(R.string.start)) {
-                if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != GalleryActivity.GRANTED &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != GalleryActivity.GRANTED
-                ){
-                    ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-                        GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION
-                    )
+                if (!locationPermissionsGranted()){
+                    requestLocationPermissions()
+
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
@@ -88,6 +84,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
     }
+
+
+
+    private fun locationPermissionsGranted() = (ContextCompat.checkSelfPermission(this,
+        Manifest.permission.ACCESS_COARSE_LOCATION) == GalleryActivity.GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == GalleryActivity.GRANTED)
+
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+            GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION)
+
+    }
+
 
     private fun isLocationServiceRunning(): Boolean {
 
@@ -126,6 +137,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -137,6 +150,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
+        requestLocationPermissions()
         mMap = googleMap
 
         mMap.isMyLocationEnabled = true
