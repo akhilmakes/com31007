@@ -5,10 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Path::class, LatLngData::class], version = 11, exportSchema = false)
+@Database(entities = [Path::class, LatLngData::class, ImageData::class], version = 12, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
-//    abstract fun imageDataDao(): ImageDataDao
+    abstract fun imageDataDao(): ImageDataDao
     abstract fun latLngDataDao(): LatLngDataDao
     abstract fun pathDao(): PathDao
 

@@ -120,9 +120,9 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
                             // Saving the ImageData to DB is implemented here, but should it?
                             // Think how changing the architecture might solve this.
                             items[position].thumbnail = it.name
-//                            var daoObj = (context.applicationContext as ImageApplication)
-//                                .databaseObj.imageDataDao()
-////                            daoObj.update(items[position])
+                            var daoObj = (context.applicationContext as ImageApplication)
+                                .databaseObj.imageDataDao()
+                            daoObj.update(items[position])
                         }
 
                     }

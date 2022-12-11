@@ -107,7 +107,7 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
-//        initData()
+        initData()
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
 
@@ -189,15 +189,15 @@ class GalleryActivity : AppCompatActivity() {
 
     //region other (custom/utility) functions
 
-//    private fun initData() {
-//        daoObj = (this@GalleryActivity.application as ImageApplication)
-//            .databaseObj.imageDataDao()
-//        runBlocking {
-//            launch(Dispatchers.Default) {
-//                myDataset.addAll(daoObj.getItems())
-//            }
-//        }
-//    }
+    private fun initData() {
+        daoObj = (this@GalleryActivity.application as ImageApplication)
+            .databaseObj.imageDataDao()
+        runBlocking {
+            launch(Dispatchers.Default) {
+                myDataset.addAll(daoObj.getItems())
+            }
+        }
+    }
 
     /**
      * onClick listener for the Adapter's ViewHolder item click

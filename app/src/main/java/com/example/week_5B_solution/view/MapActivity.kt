@@ -72,7 +72,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     this.locationViewModel!!.generateNewPath()
 
 
-
                 }
 
             } else if (controlLocationBtn.text == getString(R.string.stop)) {
@@ -142,6 +141,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
+
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
