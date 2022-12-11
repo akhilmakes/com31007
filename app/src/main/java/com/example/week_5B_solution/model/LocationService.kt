@@ -8,14 +8,20 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.media.Image
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
-import com.example.week_5B_solution.data.LatData
-import com.example.week_5B_solution.data.LatDataDao
+import com.example.week_5B_solution.data.*
+import com.example.week_5B_solution.repository.LocationRepository
+import com.example.week_5B_solution.view.MapActivity
+import com.example.week_5B_solution.viewmodel.LocationViewModel
 import com.google.android.gms.location.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -28,7 +34,9 @@ class LocationService: Service() {
 
     private lateinit var locationClient: LocationClient
 
-    private lateinit var dbLatDataDao: LatDataDao
+
+    private lateinit var dbLatLngDataDao: LatLngDataDao
+    private lateinit var dbPathDao: PathDao
 
 
 
@@ -93,7 +101,9 @@ class LocationService: Service() {
                 val lat = location.latitude
                 val long = location.longitude
 
-                dbLatDataDao!!.insert(LatData(lat = lat, lng = long, pathNum = 1))
+                val currentPath = dbPathDao.getLatestPathNum()
+
+                dbLatLngDataDao.insert(LatLngData(lat = lat, lng = long, pathID = currentPath))
 
                 val updatedNotification = builder.setContentText("Location: $lat, $long")
 
@@ -118,6 +128,8 @@ class LocationService: Service() {
     }
 
 
+
+
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null){
@@ -140,8 +152,10 @@ class LocationService: Service() {
     }
 
     private fun initDataDao(){
-        dbLatDataDao = (this@LocationService.application as ImageApplication)
-            .databaseObj.latDataDao()
+        dbPathDao = (this@LocationService.application as ImageApplication)
+            .databaseObj.pathDao()
+        dbLatLngDataDao = (this@LocationService.application as ImageApplication)
+            .databaseObj.latLngDataDao()
     }
 
     companion object{
@@ -150,6 +164,8 @@ class LocationService: Service() {
         val ACTION_STOP = "stopActionService"
 
         var currentLocation: Location? = null
+
+        var currentPath: Path? = null
 
     }
 }

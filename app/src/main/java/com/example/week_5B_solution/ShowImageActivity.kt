@@ -28,7 +28,7 @@ class ShowImageActivity : AppCompatActivity() {
         binding = ActivityShowImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        daoObj = (this.application as ImageApplication).databaseObj.imageDataDao()
+//        daoObj = (this.application as ImageApplication).databaseObj.imageDataDao()
         // intent is a property of the activity. intent.extras returns any data that was pass
         // along with the intent.
         val bundle: Bundle? = intent.extras
@@ -144,7 +144,7 @@ class ShowImageActivity : AppCompatActivity() {
         runBlocking {
             launch(Dispatchers.IO) {
                 // Note, no validation check done. Should do validation check in practice (ans assignment)
-                daoObj.update(MyAdapter.items[position])
+//                daoObj.update(MyAdapter.items[position])
 
                 // Start an intent to to tell the calling activity an update happened.
                 val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
@@ -159,7 +159,7 @@ class ShowImageActivity : AppCompatActivity() {
         runBlocking {
             launch(Dispatchers.IO) {
                 // No confirmation request from user. You should do this in practice
-                daoObj.delete(MyAdapter.items[position])
+//                daoObj.delete(MyAdapter.items[position])
 
                 // Start intent and include data to let the calling activity know a deletion happened (include position payload
                 val cacheFile = File(this@ShowImageActivity.cacheDir, MyAdapter.items[position].thumbnail)

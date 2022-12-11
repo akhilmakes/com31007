@@ -9,12 +9,6 @@ import androidx.room.Update
 
 @Dao
 interface ImageDataDao {
-    @Query("Select * from image ORDER by id ASC")
-    suspend fun getItems(): List<ImageData>
-
-    // Useful for tracking Entities
-    @Query("Select * from image Where id = :id")
-    suspend fun getItem(id: Int): ImageData
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(imageData: ImageData): Long
@@ -24,5 +18,15 @@ interface ImageDataDao {
 
     @Delete
     suspend fun delete(imageData: ImageData)
+
+    @Query("Select * from image ORDER by id ASC")
+    suspend fun getItems(): List<ImageData>
+
+    // Useful for tracking Entities
+    @Query("Select * from image Where id = :id")
+    suspend fun getItem(id: Int): ImageData
+
+    @Query("Select * from image Where pathID = :pathID")
+    suspend fun getAllPathImages(pathID: Int): List<ImageData>
 
 }

@@ -36,7 +36,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var locationViewModel: LocationViewModel? = null
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,15 +69,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
 
-                    val latData = this.locationViewModel!!.getLatDataToDisplay().value
+                    this.locationViewModel!!.generateNewPath()
 
 
-
-                    if (latData != null){
-                        Log.d("LatData", "${latData.lat}, ${latData.lng}")
-                        val latLng = LatLng(latData.lat, latData.lng)
-                        mMap.addMarker(MarkerOptions().position(latLng))
-                    }
 
                 }
 
@@ -132,8 +125,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         }
     }
-
-
 
 
     /**
