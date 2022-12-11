@@ -7,8 +7,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -66,6 +64,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     startLocationService()
 
                     this.locationViewModel!!.generateNewPath()
+
+
+
+                            val latLngData = locationViewModel!!.getLatLngDataToDisplay()
+
+                            latLngData!!.observe(this@MapActivity,{
+                                    location ->
+                                val lat = location.lat
+                                val long = location.lng
+
+                                mMap.addMarker(MarkerOptions().position(LatLng(lat, long)))
+                            })
+
 
 
                 }

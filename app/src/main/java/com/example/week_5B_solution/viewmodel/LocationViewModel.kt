@@ -13,23 +13,13 @@ import kotlinx.coroutines.launch
 class LocationViewModel(application: Application): AndroidViewModel(application) {
 
     private var locationRepo: LocationRepository = LocationRepository(application)
-    private var locations: LiveData<List<LatLngData>>?
 
 
-    init {
-        this.locations = this.locationRepo.retrieveLatLngList()
-    }
 
-    fun getLatDataToDisplay(): LiveData<List<LatLngData>> {
-        val lastLocation = this.locations!!.value!!.last()
 
-        if(this.locations == null){
-            this.locations = MutableLiveData()
-        }
+    fun getLatLngDataToDisplay(): LiveData<LatLngData>? {
 
-        Log.d("ViewModel","Location: ${lastLocation.lat}, ${lastLocation.lng}")
-
-        return this.locations!!
+        return locationRepo.retrieveLatestLatLng()
     }
 
 

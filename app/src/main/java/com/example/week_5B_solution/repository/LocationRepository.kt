@@ -37,9 +37,9 @@ class LocationRepository(application: Application) {
         }
     }
 
-    fun retrieveLatLngList(): LiveData<List<LatLngData>>? {
+     fun retrieveLatestLatLng(): LiveData<LatLngData>? {
 
-        return dbLatLngDataDao!!.getLatLng()
+        return dbLatLngDataDao!!.getLatLng(getPathNum())
     }
 
 
