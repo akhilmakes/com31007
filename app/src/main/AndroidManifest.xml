@@ -36,7 +36,7 @@
             android:value="${MAPS_KEY}" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".view.MapActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
             <intent-filter>
@@ -46,11 +46,8 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".LocationService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
+        <service android:name=".model.LocationService"
+            android:foregroundServiceType="location"/>
 
         <activity
             android:name=".CameraActivity"

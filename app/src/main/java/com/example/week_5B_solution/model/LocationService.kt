@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.model
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -8,20 +8,25 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.media.Image
 import android.os.Build
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.week_5B_solution.ImageApplication
+import com.example.week_5B_solution.R
+import com.example.week_5B_solution.data.*
+import com.example.week_5B_solution.repository.LocationRepository
+import com.example.week_5B_solution.view.MapActivity
+import com.example.week_5B_solution.viewmodel.LocationViewModel
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+
+
 
 class LocationService: Service() {
 
@@ -30,8 +35,15 @@ class LocationService: Service() {
     private lateinit var locationClient: LocationClient
 
 
+    private lateinit var dbLatLngDataDao: LatLngDataDao
+    private lateinit var dbPathDao: PathDao
+
+
+
     override fun onCreate() {
         super.onCreate()
+
+        initDataDao()
 
          locationClient = LocationClient(
             applicationContext,
@@ -82,13 +94,16 @@ class LocationService: Service() {
             }
         }
 
-         locationClient.receiveLocationUpdates(5000)
+
+         locationClient.receiveLocationUpdates(20000)
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
                 val lat = location.latitude
                 val long = location.longitude
 
-                currentLocation = location
+                val currentPath = dbPathDao.getLatestPathNum()
+
+                dbLatLngDataDao.insert(LatLngData(lat = lat, lng = long, pathID = currentPath))
 
                 val updatedNotification = builder.setContentText("Location: $lat, $long")
 
@@ -98,7 +113,6 @@ class LocationService: Service() {
             .launchIn(serviceScope)
 
         startForeground(LOCATION_SERVICE_ID, builder.build())
-
 
     }
 
@@ -112,6 +126,8 @@ class LocationService: Service() {
         stopForeground(LOCATION_SERVICE_ID)
         stopSelf()
     }
+
+
 
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -135,12 +151,21 @@ class LocationService: Service() {
         return null
     }
 
+    private fun initDataDao(){
+        dbPathDao = (this@LocationService.application as ImageApplication)
+            .databaseObj.pathDao()
+        dbLatLngDataDao = (this@LocationService.application as ImageApplication)
+            .databaseObj.latLngDataDao()
+    }
+
     companion object{
         val LOCATION_SERVICE_ID = 175
         val ACTION_START = "startActionService"
         val ACTION_STOP = "stopActionService"
 
         var currentLocation: Location? = null
+
+        var currentPath: Path? = null
 
     }
 }

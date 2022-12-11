@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -7,12 +7,16 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import com.example.week_5B_solution.GalleryActivity
+import com.example.week_5B_solution.model.LocationService
+import com.example.week_5B_solution.viewmodel.LocationViewModel
+import com.example.week_5B_solution.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -22,16 +26,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    private var locationViewModel: LocationViewModel? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +42,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        this.locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
+
+
+        // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -47,11 +54,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
-        /*
-        * controlLocationBtn is assigned an onClickListener to start the location service if the
-        * permissions are granted, otherwise it will request permissions. If the button has text
-        * 'Start' then it will change to 'Stop' and vice versa.
-        * */
         controlLocationBtn.setOnClickListener{ button ->
 
             if(controlLocationBtn.text == getString(R.string.start)) {
@@ -66,6 +68,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
+
+                    this.locationViewModel!!.generateNewPath()
+
 
                 }
 
@@ -83,11 +88,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
     }
-    /*
-    * function: isLocationServiceRunning()
-    * Checks the running services to return true or false if the location service
-    * is running.
-    */
+
     private fun isLocationServiceRunning(): Boolean {
 
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -101,11 +102,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    /*
-    * function: startLocationService()
-    * Creates an Intent to start the location service and its corresponding action, and displays
-    * a Toast to notify the service has been started.
-    */
     private fun startLocationService() {
         if(!isLocationServiceRunning()){
             val intent = Intent(
@@ -117,11 +113,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    /*
-    * function: stopLocationService()
-    * Creates an Intent to stop the location service and its corresponding action, and displays
-    * a Toast to notify the service has been stopped.
-    */
     private fun stopLocationService() {
         if(isLocationServiceRunning()){
             val intent = Intent(
@@ -150,6 +141,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
+
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)

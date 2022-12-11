@@ -5,7 +5,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import androidx.exifinterface.media.ExifInterface
+// import android.media.ExifInterface
+// import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -48,7 +49,8 @@ class ShowImageActivity : AppCompatActivity() {
                 MyAdapter.items[position].description?.isNotEmpty().apply {
                     binding.editTextDescription.setText(MyAdapter.items[position].description)
                 }
-                val exif = ExifInterface(MyAdapter.items[position].imagePath)
+                val exif =
+                    androidx.exifinterface.media.ExifInterface(MyAdapter.items[position].imagePath)
                // exif.latLong?.get(0) // latitude
                // exif.latLong?.get(1) // longitude
                 val lat = exif.latLong?.get(0)
@@ -170,7 +172,7 @@ class ShowImageActivity : AppCompatActivity() {
         runBlocking {
             launch(Dispatchers.IO) {
                 // No confirmation request from user. You should do this in practice
-                daoObj.delete(MyAdapter.items[position])
+//                daoObj.delete(MyAdapter.items[position])
 
                 // Start intent and include data to let the calling activity know a deletion happened (include position payload
                 val cacheFile = File(this@ShowImageActivity.cacheDir, MyAdapter.items[position].thumbnail)
