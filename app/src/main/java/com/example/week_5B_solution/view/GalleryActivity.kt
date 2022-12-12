@@ -2,6 +2,8 @@ package com.example.week_5B_solution.view
 
 
 import android.Manifest
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -26,6 +28,7 @@ import com.example.week_5B_solution.R
 import com.example.week_5B_solution.model.CameraActivity
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.model.ImageDataDao
+import com.example.week_5B_solution.model.LocationService
 import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -158,11 +161,15 @@ class GalleryActivity : AppCompatActivity() {
 
         // Start the CameraActivity using the ActivityResultContract registered to handle
         // the result when the Activity returns
-        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openCamFab)
+        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openCamFab).apply {
+            if (isLocationServiceRunning()) show()
+            else hide()
+        }
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
             val intent = Intent(this, CameraActivity::class.java)
             pickFromCamera.launch(intent)
         })
+
 
 
 
@@ -171,6 +178,19 @@ class GalleryActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
+    }
+
+    private fun isLocationServiceRunning(): Boolean {
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
+            if(LocationService::class.java.name.equals(service.service.className)){
+                if(service.foreground) return true
+            }
+        }
+        return false
+
     }
 
 
