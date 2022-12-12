@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
 import android.content.ContentResolver
 import android.content.Context
@@ -15,7 +15,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.data.ImageData
+import com.example.week_5B_solution.ImageApplication
+import com.example.week_5B_solution.R
+import com.example.week_5B_solution.model.ImageData
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -28,11 +30,11 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
     //region constructors
 
     constructor(items: List<ImageData>) {
-        MyAdapter.items = items as MutableList<ImageData>
+        Companion.items = items as MutableList<ImageData>
     }
 
     constructor(cont: Context, items: List<ImageData>) : super() {
-        MyAdapter.items = items as MutableList<ImageData>
+        Companion.items = items as MutableList<ImageData>
         context = cont
     }
 
@@ -146,7 +148,7 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
 
     override fun getItemCount(): Int {
-        return MyAdapter.items.size
+        return items.size
     }
 
     //endregion overriden functions from RecyclerView.Adapyer super class
@@ -169,7 +171,7 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         } else {
             // even if useThumbnailFunc is true but the API is older than 29,
             // fallback to decodeSampledBitmapFromResource
-            MyAdapter.decodeSampledBitmapFromResource(uri, 150, 150, context.contentResolver)
+            decodeSampledBitmapFromResource(uri, 150, 150, context.contentResolver)
         }
     }
 

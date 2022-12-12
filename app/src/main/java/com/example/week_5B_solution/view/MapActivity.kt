@@ -12,9 +12,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.GalleryActivity
 import com.example.week_5B_solution.model.LocationService
-import com.example.week_5B_solution.viewmodel.LocationViewModel
+import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.example.week_5B_solution.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -32,7 +31,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
-    private var locationViewModel: LocationViewModel? = null
+    private var appViewModel: AppViewModel? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +40,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        this.locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
+        this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
 
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
@@ -63,21 +62,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
 
-                    this.locationViewModel!!.generateNewPath()
-
-
-
-                            val latLngData = locationViewModel!!.getLatLngDataToDisplay()
-
-                            latLngData!!.observe(this@MapActivity,{
-                                    location ->
-                                val lat = location.lat
-                                val long = location.lng
-
-                                mMap.addMarker(MarkerOptions().position(LatLng(lat, long)))
-                            })
-
-
+                    this.appViewModel!!.generateNewPath()
 
                 }
 

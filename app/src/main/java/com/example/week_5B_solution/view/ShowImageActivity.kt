@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
@@ -13,11 +13,13 @@ import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import com.example.week_5B_solution.data.ImageDataDao
+import com.example.week_5B_solution.model.ImageDataDao
 import com.example.week_5B_solution.databinding.ActivityShowImageBinding
+import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -28,12 +30,15 @@ class ShowImageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityShowImageBinding
     private lateinit var daoObj: ImageDataDao
 
+    private var appViewModel: AppViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShowImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        daoObj = (this.application as ImageApplication).databaseObj.imageDataDao()
+        this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+
         // intent is a property of the activity. intent.extras returns any data that was pass
         // along with the intent.
         val bundle: Bundle? = intent.extras
@@ -49,14 +54,6 @@ class ShowImageActivity : AppCompatActivity() {
                 MyAdapter.items[position].description?.isNotEmpty().apply {
                     binding.editTextDescription.setText(MyAdapter.items[position].description)
                 }
-                val exif =
-                    androidx.exifinterface.media.ExifInterface(MyAdapter.items[position].imagePath)
-               // exif.latLong?.get(0) // latitude
-               // exif.latLong?.get(1) // longitude
-                val lat = exif.latLong?.get(0)
-                val long = exif.latLong?.get(1)
-                binding.editTextLatlong.setText("$lat, $long")
-
 
                 // onClick listener for the update button
                 binding.buttonSave.setOnClickListener {
@@ -154,10 +151,10 @@ class ShowImageActivity : AppCompatActivity() {
         MyAdapter.items[position].title = binding.editTextTitle.text.toString()
         MyAdapter.items[position].description = binding.editTextDescription.text.toString()
 
+        this.appViewModel!!.updateImage(MyAdapter.items[position])
+
         runBlocking {
             launch(Dispatchers.IO) {
-                // Note, no validation check done. Should do validation check in practice (ans assignment)
-                daoObj.update(MyAdapter.items[position])
 
                 // Start an intent to to tell the calling activity an update happened.
                 val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
@@ -169,11 +166,14 @@ class ShowImageActivity : AppCompatActivity() {
     }
 
     private fun onDeleteButtonClickListener(view: View, position: Int){
+
+        // No confirmation request from user. You should do this in practice
+
+        this.appViewModel!!.deleteImage(MyAdapter.items[position])
+
+
         runBlocking {
             launch(Dispatchers.IO) {
-                // No confirmation request from user. You should do this in practice
-//                daoObj.delete(MyAdapter.items[position])
-
                 // Start intent and include data to let the calling activity know a deletion happened (include position payload
                 val cacheFile = File(this@ShowImageActivity.cacheDir, MyAdapter.items[position].thumbnail)
                 cacheFile.delete()
