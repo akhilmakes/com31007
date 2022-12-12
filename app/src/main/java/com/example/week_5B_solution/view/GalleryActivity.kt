@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -45,20 +46,22 @@ class GalleryActivity : AppCompatActivity() {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             this@GalleryActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
-            lateinit var imageData: ImageData
-
             this.appViewModel!!.retrieveCurrentPath().observe(this, {
                 pathNumber ->
-                imageData = ImageData(
+                 val imageData = ImageData(
                     title = "Add Title Here",
                     description = "Add Description Here",
                     imagePath = uri.toString(),
                     pathID = pathNumber
                 )
+
+                Log.d("CurrentPath:", "$pathNumber")
+                this.appViewModel!!.addImage(imageData, uri)
+                myDataset.add(imageData)
             })
 
 
-            myDataset.add(imageData)
+
             mRecyclerView.scrollToPosition(myDataset.size - 1)
         }
     }
@@ -69,19 +72,21 @@ class GalleryActivity : AppCompatActivity() {
             photo_uri?.let{
                 val uri = Uri.parse(photo_uri)
 
-                lateinit var imageData: ImageData
-
                 this.appViewModel!!.retrieveCurrentPath().observe(this, {
                         pathNumber ->
-                    imageData = ImageData(
+                    Log.d("CurrentPath:", "$pathNumber")
+                   val imageData = ImageData(
                         title = "Add Title Here",
                         description = "Add Description Here",
                         imagePath = uri.toString(),
                         pathID = pathNumber
                     )
+
+                    this.appViewModel!!.addImage(imageData, uri)
+                    myDataset.add(imageData)
                 })
 
-                myDataset.add(imageData)
+
                 mRecyclerView.scrollToPosition(myDataset.size - 1)
         }
     }

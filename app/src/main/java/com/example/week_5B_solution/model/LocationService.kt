@@ -94,7 +94,7 @@ class LocationService: Service() {
                 val lat = location.latitude
                 val long = location.longitude
 
-                val currentPath = dbPathDao.getLatestPathNum()
+                val currentPath = dbPathDao.getCurrentPathNum()
 
                 dbLatLngDataDao.insert(LatLngData(lat = lat, lng = long, pathID = currentPath))
 

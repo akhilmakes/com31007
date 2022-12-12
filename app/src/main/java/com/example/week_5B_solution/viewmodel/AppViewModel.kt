@@ -23,12 +23,6 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
 
     fun addImage(imageData: ImageData, uri: Uri): ImageData {
 
-        val imageData = ImageData(
-            title = "title unspecified",
-            imagePath = uri.toString(),
-            pathID = 1
-        )
-
         viewModelScope.launch { appRepository.insertImage(imageData) }
 
         return imageData
@@ -46,8 +40,6 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch { appRepository.deleteImage(imageData) }
 
     }
-
-
 
 
     fun generateNewPath(){

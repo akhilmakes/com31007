@@ -19,4 +19,7 @@ interface PathDao {
     @Query("Select id from path ORDER BY id DESC LIMIT 1")
     fun getLatestPathNum(): LiveData<Int>
 
+    @Query("Select id from path ORDER BY id DESC LIMIT 1")
+    fun getCurrentPathNum(): Int
+
 }
