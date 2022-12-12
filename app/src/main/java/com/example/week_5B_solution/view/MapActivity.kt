@@ -5,10 +5,14 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +27,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
+import com.example.week_5B_solution.model.CameraActivity
+import com.example.week_5B_solution.model.ImageData
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 
@@ -32,6 +38,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
 
     private var appViewModel: AppViewModel? = null
+
+
+    var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
+        val photo_uri = result.data?.extras?.getString("uri")
+
+        photo_uri?.let{
+            val uri = Uri.parse(photo_uri)
+
+            this.appViewModel!!.retrieveCurrentPath().observe(this, {
+                    pathNumber ->
+                Log.d("CurrentPath:", "$pathNumber")
+                val imageData = ImageData(
+                    title = "Add Title Here",
+                    description = "Add Description Here",
+                    imagePath = uri.toString(),
+                    pathID = pathNumber
+                )
+
+                this.appViewModel!!.addImage(imageData, uri)
+            })
+
+
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +82,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
+        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.capture_image_fab)
+
+        cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
+            val intent = Intent(this, CameraActivity::class.java)
+            pickFromCamera.launch(intent)
+        })
+
+        cameraPickerFab.hide()
+
         controlLocationBtn.setOnClickListener{ button ->
 
             if(controlLocationBtn.text == getString(R.string.start)) {
@@ -61,6 +100,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
+                    cameraPickerFab.show()
 
                     this.appViewModel!!.generateNewPath()
 
@@ -69,6 +109,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             } else if (controlLocationBtn.text == getString(R.string.stop)) {
                 controlLocationBtn.text = getString(R.string.start)
                 stopLocationService()
+                cameraPickerFab.hide()
             }
 
         }
@@ -79,6 +120,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val intent = Intent(applicationContext, GalleryActivity::class.java)
             startActivity(intent)
         }
+
+
+
+
+
     }
 
 
