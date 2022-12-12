@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,8 @@ class GalleryActivity : AppCompatActivity() {
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
     private lateinit var daoObj: ImageDataDao
 
+    private var pathNumber: Int? = null
+
     private var appViewModel: AppViewModel? = null
 
     //region ActivityResultContracts
@@ -46,20 +49,15 @@ class GalleryActivity : AppCompatActivity() {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             this@GalleryActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
-            this.appViewModel!!.retrieveCurrentPath().observe(this, {
-                pathNumber ->
-                 val imageData = ImageData(
-                    title = "Add Title Here",
-                    description = "Add Description Here",
-                    imagePath = uri.toString(),
-                    pathID = pathNumber
-                )
+            val imageData = ImageData(
+                title = "Add Title Here",
+                description = "Add Description Here",
+                imagePath = uri.toString(),
+                pathID = pathNumber!!
+            )
 
-                Log.d("CurrentPath:", "$pathNumber")
-                this.appViewModel!!.addImage(imageData, uri)
-                myDataset.add(imageData)
-            })
-
+            this.appViewModel!!.addImage(imageData, uri)
+            myDataset.add(imageData)
 
 
             mRecyclerView.scrollToPosition(myDataset.size - 1)
@@ -72,19 +70,15 @@ class GalleryActivity : AppCompatActivity() {
             photo_uri?.let{
                 val uri = Uri.parse(photo_uri)
 
-                this.appViewModel!!.retrieveCurrentPath().observe(this, {
-                        pathNumber ->
-                    Log.d("CurrentPath:", "$pathNumber")
-                   val imageData = ImageData(
-                        title = "Add Title Here",
-                        description = "Add Description Here",
-                        imagePath = uri.toString(),
-                        pathID = pathNumber
-                    )
+                val imageData = ImageData(
+                    title = "Add Title Here",
+                    description = "Add Description Here",
+                    imagePath = uri.toString(),
+                    pathID = pathNumber!!
+                )
 
-                    this.appViewModel!!.addImage(imageData, uri)
-                    myDataset.add(imageData)
-                })
+                this.appViewModel!!.addImage(imageData, uri)
+                myDataset.add(imageData)
 
 
                 mRecyclerView.scrollToPosition(myDataset.size - 1)
@@ -132,6 +126,12 @@ class GalleryActivity : AppCompatActivity() {
         initData()
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+
+        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
+            currentPath ->
+
+            pathNumber = currentPath
+        })
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
 

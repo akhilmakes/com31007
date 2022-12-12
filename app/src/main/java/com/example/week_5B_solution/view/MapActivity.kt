@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.model.LocationService
 import com.example.week_5B_solution.viewmodel.AppViewModel
@@ -46,18 +47,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         photo_uri?.let{
             val uri = Uri.parse(photo_uri)
 
-            this.appViewModel!!.retrieveCurrentPath().observe(this, {
-                    pathNumber ->
-                Log.d("CurrentPath:", "$pathNumber")
-                val imageData = ImageData(
-                    title = "Add Title Here",
-                    description = "Add Description Here",
-                    imagePath = uri.toString(),
-                    pathID = pathNumber
-                )
-
-                this.appViewModel!!.addImage(imageData, uri)
-            })
+            val imageData = ImageData(
+                title = "Add Title Here",
+                description = "Add Description Here",
+                imagePath = uri.toString(),
+                pathID = pathNumber!!
+            )
+            this.appViewModel!!.addImage(imageData, uri)
 
 
         }
@@ -71,6 +67,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+
+
+        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
+            currentPath ->
+
+            pathNumber = currentPath
+        })
 
 
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
@@ -203,5 +206,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
+
+    companion object{
+        var pathNumber: Int? = null
     }
 }
