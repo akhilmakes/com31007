@@ -1,6 +1,7 @@
 package com.example.week_5B_solution.repository
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.model.*
@@ -103,7 +104,7 @@ class AppRepository(application: Application) {
 
     //Functions to Access/Update Path Table
 
-    fun getPathNum(): Int {
+    fun getPathNum(): LiveData<Int> {
         return dbPathDao!!.getLatestPathNum()
     }
 

@@ -45,8 +45,18 @@ class GalleryActivity : AppCompatActivity() {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             this@GalleryActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
+            lateinit var imageData: ImageData
 
-            val imageData: ImageData = this.appViewModel!!.addImage(uri)
+            this.appViewModel!!.retrieveCurrentPath().observe(this, {
+                pathNumber ->
+                imageData = ImageData(
+                    title = "Add Title Here",
+                    description = "Add Description Here",
+                    imagePath = uri.toString(),
+                    pathID = pathNumber
+                )
+            })
+
 
             myDataset.add(imageData)
             mRecyclerView.scrollToPosition(myDataset.size - 1)
@@ -59,7 +69,17 @@ class GalleryActivity : AppCompatActivity() {
             photo_uri?.let{
                 val uri = Uri.parse(photo_uri)
 
-                val imageData: ImageData = this.appViewModel!!.addImage(uri)
+                lateinit var imageData: ImageData
+
+                this.appViewModel!!.retrieveCurrentPath().observe(this, {
+                        pathNumber ->
+                    imageData = ImageData(
+                        title = "Add Title Here",
+                        description = "Add Description Here",
+                        imagePath = uri.toString(),
+                        pathID = pathNumber
+                    )
+                })
 
                 myDataset.add(imageData)
                 mRecyclerView.scrollToPosition(myDataset.size - 1)
