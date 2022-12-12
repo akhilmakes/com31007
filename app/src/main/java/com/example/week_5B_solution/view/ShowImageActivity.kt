@@ -10,9 +10,11 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.isDigitsOnly
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +25,9 @@ import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
 
 class ShowImageActivity : AppCompatActivity() {
 
@@ -53,6 +58,33 @@ class ShowImageActivity : AppCompatActivity() {
                 binding.editTextTitle.setText(MyAdapter.items[position].title)
                 MyAdapter.items[position].description?.isNotEmpty().apply {
                     binding.editTextDescription.setText(MyAdapter.items[position].description)
+                }
+                try {
+                    val imgUri = Uri.parse(MyAdapter.items[position].imagePath)
+
+                    var input = contentResolver.openInputStream(imgUri)!!
+
+                    val exif = ExifInterface(input)
+
+                    val lat = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE)
+                    val long = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE)
+                    val date = exif.getAttribute(ExifInterface.TAG_DATETIME)
+
+                    if(lat == long){
+                        binding.editTextLatlong.setText("There is no GPS data")
+                    }
+                    else {
+                        binding.editTextLatlong.setText("$lat, $long")
+                    }
+
+                    binding.editTextDate.setText("$date")
+
+                } catch (e: FileNotFoundException) {
+                    Log.d(
+                        "FileException",
+                        "File Path: ${MyAdapter.items[position].imagePath} is Not Found"
+                    )
+                    e.printStackTrace()
                 }
 
                 // onClick listener for the update button

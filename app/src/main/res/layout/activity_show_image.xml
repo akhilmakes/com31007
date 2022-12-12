@@ -70,6 +70,15 @@
             android:layout_marginBottom="4dp"
             android:ems="10"
             android:text="latlong"
+            app:layout_constraintBottom_toTopOf="@+id/editText_date" />
+
+        <EditText
+            android:id="@+id/editText_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:ems="10"
+            android:text="Date"
             app:layout_constraintBottom_toTopOf="@+id/textView_location" />
 
         <TextView
