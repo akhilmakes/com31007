@@ -22,6 +22,8 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
 
     var markerDataList : List<LocationTitle>? = null
 
+    var cameraLatLng : LatLngData? = null
+
 
     init {
         currentPath = appRepository.getPathNum()
@@ -73,6 +75,10 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         return markerDataList!!
     }
 
-
-
+    fun getLatLngForCamera(id: Int) : LatLngData {
+        viewModelScope.launch{
+            cameraLatLng = appRepository.getLatLngForCamera(id)
+        }
+        return cameraLatLng!!
+    }
 }

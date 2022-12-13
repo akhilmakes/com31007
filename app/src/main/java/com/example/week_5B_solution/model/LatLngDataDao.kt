@@ -15,14 +15,15 @@ interface LatLngDataDao {
     @Delete
     suspend fun delete(latLngData: LatLngData)
 
+    // For the camera move
     @Query("Select * from latlng where pathID = :pathID ORDER by id DESC LIMIT 1")
     fun getLatLng(pathID: Int): LatLngData
 
-    // Useful for tracking Entities
+    // For the whole path
     @Query("Select * from latlng Where pathID = :id")
     fun getItem(id: Int): List<LatLngData>
 
-
+    // For the markers
     @Query("select * from latlng A LEFT JOIN path B On pathID = pathID group by pathID")
     fun getOneLatLngFromPath(): List<LocationTitle>
 

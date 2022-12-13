@@ -17,6 +17,7 @@ class AppRepository(application: Application) {
     private var dbImageDataDao: ImageDataDao? = null
     private lateinit var pathLatLngList : List<LatLngData>
     private lateinit var LatLngForMarkerList : List<LocationTitle>
+    private lateinit var LatLngForCamera : LatLngData
 
     init {
         dbPathDao = (application as ImageApplication)
@@ -127,13 +128,22 @@ class AppRepository(application: Application) {
         InsertAsyncTaskPath(dbPathDao).insertInBackground(Path(title = "Add title here"))
     }
 
-    suspend fun getOneLatLngFromPath() : List<LocationTitle>{
+    fun getOneLatLngFromPath() : List<LocationTitle>{
         runBlocking {
             launch(Dispatchers.Default) {
                 LatLngForMarkerList = dbLatLngDataDao!!.getOneLatLngFromPath()
             }
         }
         return LatLngForMarkerList
+    }
+
+    fun getLatLngForCamera(id : Int) : LatLngData {
+        runBlocking {
+            launch(Dispatchers.Default) {
+                LatLngForCamera = dbLatLngDataDao!!.getLatLng(id)
+            }
+        }
+        return LatLngForCamera
     }
 
 }

@@ -38,21 +38,6 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var pathLatLngList : List<LatLngData>
     private lateinit var result : List<LatLngData>
 
-//    private fun initPath(id:Int) : List<LatLngData> {
-//        dbLatLngDataDao = (this@PathDetailActivity.application as ImageApplication)
-//            .databaseObj.latLngDataDao()
-//
-//        runBlocking {
-//            launch(Dispatchers.Default){
-//                pathLatLngList = dbLatLngDataDao.getItem(id)
-//            }
-//
-//        }
-//
-//        return pathLatLngList
-//
-//    }
-
 
     private fun initDataDao(){
         dbLatLngDataDao = (this@PathDetailActivity.application as ImageApplication)
@@ -99,11 +84,13 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         var pathID = intent.getIntExtra("pathID",-1)
 
         // var pathLatLngList = dbLatLngDataDao.getItem(pathID)
-        // var test = dbLatLngDataDao.getLatLng(pathID)
+        var cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
 
-        Log.d("Detail", "pathID is $pathID.toString()")
-        // Log.d("Detail", "test value is $test.toString()")
+        //Log.d("Detail", "pathID is $pathID.toString()")
+        Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
+        Log.d("Detail", "camera lng value is ${cameraLatLng.lng}")
 
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(cameraLatLng.lat, cameraLatLng.lng)))
 
         val polylineOptions = PolylineOptions()
 
@@ -114,9 +101,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.addPolyline(polylineOptions)
 
-//        val sydney = LatLng(-34.0, 151.0)
-//        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        // mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(test.lat, test.lng)))
+
     }
 
 }
