@@ -68,6 +68,7 @@
         <activity
             android:name=".GalleryActivity"
             android:exported="true"></activity>
+
     </application>
 
 </manifest>

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -15,10 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.GalleryActivity
 import com.example.week_5B_solution.ImageApplication
+import com.example.week_5B_solution.PathDetailActivity
 import com.example.week_5B_solution.model.LocationService
 import com.example.week_5B_solution.viewmodel.LocationViewModel
 import com.example.week_5B_solution.R
 import com.example.week_5B_solution.data.LatLngDataDao
+import com.example.week_5B_solution.data.LocationTitle
 import com.example.week_5B_solution.data.PathDao
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -41,6 +44,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var dbLatLngDataDao: LatLngDataDao
     private lateinit var dbPathDao : PathDao
 
+
     private fun initDataDao(){
         dbLatLngDataDao = (this@MapActivity.application as ImageApplication)
             .databaseObj.latLngDataDao()
@@ -59,6 +63,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         initDataDao()
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -162,23 +167,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
        var markerList = dbLatLngDataDao.getOnePathData()
 
-        markerList.observe(this,{
-            value ->
-           for (i in value){
-               Log.d("Marker", i.toString())
-               //Log.d("Marker", i.title.toString())
-//               Log.d("Marker", i.lng.toString())
+        markerList.observe(this) { value ->
+            for (i in value) {
+                Log.d("Marker", i.toString())
+                //Log.d("Marker", i.title)
 //               Log.d("Marker", i.pathID.toString())
-               mMap.addMarker(MarkerOptions()
-                   .position(LatLng(i.lat, i.lng))
-                   .title(i.title))
-           }
-        })
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(i.lat, i.lng))
+                        .title(i.title)
+                        .snippet(i.pathID.toString())
+                )
+
+                mMap.setOnMarkerClickListener {marker->
+                    var intent = Intent(this, PathDetailActivity::class.java)
+                    //Log.d("Extra", i.toString())
+                    intent.putExtra("title", marker.title)
+                    intent.putExtra("pathID", marker.snippet.toString().toInt())
+                    Log.d("Extra", marker.title!!)
+                    Log.d("Extra", marker.snippet!!)
+                    startActivity(intent)
+
+                    true
+                }
+
+            }
+        }
 
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+//        mMap.addMarker(MarkerOptions().position(LatLng(53/1,23/1,1671468/100000,
+//            1/1,28/1,4375596/100000)))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
     }

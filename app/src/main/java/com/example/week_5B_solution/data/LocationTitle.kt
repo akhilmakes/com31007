@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class LocationTitle(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey(autoGenerate = false) var pathID: Int,
+    // @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name="lat") val lat: Double,
     @ColumnInfo(name="lng") val lng: Double,
-    @ColumnInfo(name="pathID") var pathID: Int?,
     @ColumnInfo(name = "title") var title: String
 )
