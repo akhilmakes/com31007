@@ -12,9 +12,11 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
     <application
         android:name=".ImageApplication"
@@ -50,25 +52,25 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".model.LocationService"
-            android:foregroundServiceType="location" />
+        <service android:name=".model.LocationService"
+            android:foregroundServiceType="location"/>
 
         <activity
-            android:name=".CameraActivity"
-            android:exported="false">
+            android:name=".model.CameraActivity"
+            android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".ShowImageActivity"
+            android:name=".view.ShowImageActivity"
             android:exported="false"
             android:label="@string/title_activity_show_image" />
         <activity
-            android:name=".GalleryActivity"
-            android:exported="true"></activity>
+            android:name=".view.GalleryActivity"
+            android:exported="true" >
 
+        </activity>
     </application>
 
 </manifest>
