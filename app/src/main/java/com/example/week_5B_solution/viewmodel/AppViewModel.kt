@@ -1,6 +1,7 @@
 package com.example.week_5B_solution.viewmodel
 
 import android.app.Application
+import android.media.Image
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,6 +15,8 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
     private var appRepository: AppRepository = AppRepository(application)
 
     private var currentPath: LiveData<Int>
+
+    private var pathImageList: List<ImageData>? = null
 
 
     init {
@@ -39,6 +42,13 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
 
         viewModelScope.launch { appRepository.deleteImage(imageData) }
 
+    }
+
+    fun retrievePathImages(pathID: Int): List<ImageData>{
+
+        viewModelScope.launch {  pathImageList = appRepository.getPathImages(pathID) }
+
+        return pathImageList!!
     }
 
 

@@ -8,11 +8,14 @@ import com.example.week_5B_solution.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AppRepository(application: Application) {
     private var dbPathDao: PathDao? = null
     private var dbLatLngDataDao: LatLngDataDao? = null
     private var dbImageDataDao: ImageDataDao? = null
+
+    private var pathImages: List<ImageData>? = null
 
     init {
         dbPathDao = (application as ImageApplication)
@@ -97,6 +100,22 @@ class AppRepository(application: Application) {
     suspend fun deleteImage(imageData: ImageData){
 
         DeleteAsyncTaskImageData(dbImageDataDao).deleteInBackground(imageData)
+
+    }
+
+    suspend fun getPathImages(pathId: Int): List<ImageData>{
+
+
+
+        runBlocking {
+            launch(Dispatchers.Default){
+
+               pathImages = dbImageDataDao!!.getAllPathImages(pathId)
+
+            }
+        }
+
+        return pathImages!!
 
     }
 

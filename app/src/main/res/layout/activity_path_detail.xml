@@ -17,6 +17,8 @@
         android:layout_marginRight="15dp"
         tools:context=".view.MapActivity"/>
 
+    <include layout="@layout/content_path"/>
+
     <TextView
         android:layout_width="300dp"
         android:layout_height="wrap_content"

@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
-class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
+class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
     private lateinit var context: Context
 
 
@@ -144,7 +144,7 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.itemView.setOnClickListener(View.OnClickListener {
             // the listener is implemented in MainActivity
 
-            (context as GalleryActivity).onViewHolderItemClick(position)
+            (context as PathDetailActivity).onViewHolderItemClick(position)
 
 
         })
