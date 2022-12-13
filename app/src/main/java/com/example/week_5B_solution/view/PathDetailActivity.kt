@@ -37,6 +37,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var pathLatLngList : List<LatLngData>
     private lateinit var result : List<LatLngData>
+    private lateinit var pathLocation: LatLng
 
 
     private fun initDataDao(){
@@ -65,6 +66,9 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         var title = intent.getStringExtra("title")
         var pathID = intent.getIntExtra("pathID",-1)
 
+        var cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
+        pathLocation = LatLng(cameraLatLng.lat, cameraLatLng.lng)
+
         //result = initPath(pathID)
         result = this.appViewModel!!.getAllLatLng(pathID)
 
@@ -80,17 +84,20 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-
         var pathID = intent.getIntExtra("pathID",-1)
 
+        val sydney = LatLng(-34.0, 151.0)
+
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+
         // var pathLatLngList = dbLatLngDataDao.getItem(pathID)
-        var cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
+
 
         //Log.d("Detail", "pathID is $pathID.toString()")
-        Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
-        Log.d("Detail", "camera lng value is ${cameraLatLng.lng}")
+        //Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
+        //Log.d("Detail", "camera lng value is ${cameraLatLng.lng}")
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(cameraLatLng.lat, cameraLatLng.lng)))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(cameraLatLng.lat, cameraLatLng.lng)))
 
         val polylineOptions = PolylineOptions()
 
@@ -100,7 +107,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         mMap.addPolyline(polylineOptions)
-
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(pathLocation))
 
     }
 
