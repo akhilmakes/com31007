@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
 
 import android.Manifest
@@ -6,30 +6,33 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.data.ImageData
-import com.example.week_5B_solution.data.ImageDataDao
+import com.example.week_5B_solution.ImageApplication
+import com.example.week_5B_solution.R
+import com.example.week_5B_solution.model.CameraActivity
+import com.example.week_5B_solution.model.ImageData
+import com.example.week_5B_solution.model.ImageDataDao
+import com.example.week_5B_solution.model.LocationService
+import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
-import java.io.File
 
 class GalleryActivity : AppCompatActivity() {
     private lateinit var mRecyclerView: RecyclerView
@@ -38,6 +41,10 @@ class GalleryActivity : AppCompatActivity() {
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
     private lateinit var daoObj: ImageDataDao
 
+    private var pathNumber: Int? = null
+
+    private var appViewModel: AppViewModel? = null
+
     //region ActivityResultContracts
     val photoPicker = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let{
@@ -45,13 +52,17 @@ class GalleryActivity : AppCompatActivity() {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             this@GalleryActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
-            lateinit var imageData: ImageData
-            runBlocking {
-                launch{
-                    imageData = initNewImageData(uri)
-                }
-            }
+            val imageData = ImageData(
+                title = "Add Title Here",
+                description = "Add Description Here",
+                imagePath = uri.toString(),
+                pathID = pathNumber!!
+            )
+
+            this.appViewModel!!.addImage(imageData, uri)
             myDataset.add(imageData)
+
+
             mRecyclerView.scrollToPosition(myDataset.size - 1)
         }
     }
@@ -62,13 +73,17 @@ class GalleryActivity : AppCompatActivity() {
             photo_uri?.let{
                 val uri = Uri.parse(photo_uri)
 
-                lateinit var imageData: ImageData
-                runBlocking {
-                    launch{
-                        imageData = initNewImageData(uri)
-                    }
-                }
+                val imageData = ImageData(
+                    title = "Add Title Here",
+                    description = "Add Description Here",
+                    imagePath = uri.toString(),
+                    pathID = pathNumber!!
+                )
+
+                this.appViewModel!!.addImage(imageData, uri)
                 myDataset.add(imageData)
+
+
                 mRecyclerView.scrollToPosition(myDataset.size - 1)
         }
     }
@@ -113,6 +128,14 @@ class GalleryActivity : AppCompatActivity() {
 
         initData()
 
+        this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+
+        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
+            currentPath ->
+
+            pathNumber = currentPath
+        })
+
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
 
         mRecyclerView = findViewById<RecyclerView>(R.id.my_list)
@@ -138,7 +161,10 @@ class GalleryActivity : AppCompatActivity() {
 
         // Start the CameraActivity using the ActivityResultContract registered to handle
         // the result when the Activity returns
-        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openCamFab)
+        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openCamFab).apply {
+            if (isLocationServiceRunning()) show()
+            else hide()
+        }
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
             val intent = Intent(this, CameraActivity::class.java)
             pickFromCamera.launch(intent)
@@ -146,11 +172,25 @@ class GalleryActivity : AppCompatActivity() {
 
 
 
+
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
-                this, GalleryActivity.REQUIRED_PERMISSIONS, GalleryActivity.REQUEST_CODE_PERMISSIONS
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
+    }
+
+    private fun isLocationServiceRunning(): Boolean {
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
+            if(LocationService::class.java.name.equals(service.service.className)){
+                if(service.foreground) return true
+            }
+        }
+        return false
+
     }
 
 
@@ -176,7 +216,7 @@ class GalleryActivity : AppCompatActivity() {
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == GalleryActivity.REQUEST_CODE_PERMISSIONS) {
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 Toast.makeText(this,
                     "All permissions granted by the user.",
@@ -214,40 +254,6 @@ class GalleryActivity : AppCompatActivity() {
         showImageActivityResultContract.launch(intent)
     }
 
-    /**
-     * Function introduced to contain the task of creating a new ImageData object
-     * Image data objects are saved to DB after creation.
-     */
-    private suspend fun initNewImageData(uri: Uri): ImageData{
-
-        var imageData = ImageData(
-            title = "title unspecified",
-            imagePath = uri.toString(),
-            pathID = 1
-        )
-        daoObj?.let {
-            coroutineScope{
-                val insertJob = async(Dispatchers.IO){
-                    // Insert the newly created ImageData entity
-                    daoObj.insert(imageData)
-                }
-
-                // The id of the newly inserted row, if successful.
-                // Note that this implementation does not consider what happens if insertion fails, but really should
-                val rowId = insertJob.await().toInt()
-
-                // Using the rowId, retrieve the ImageData object from db,
-                // or just update the id in the existing object
-                // imageData.id = rowId
-                val retrieveJob = async(Dispatchers.IO) {
-                    daoObj.getItem(rowId)
-                }
-                imageData = retrieveJob.await()
-            }
-        }
-
-        return imageData
-    }
 
     // Called in onCreate to check if permissions have been granted
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

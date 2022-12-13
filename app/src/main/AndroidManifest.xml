@@ -50,18 +50,18 @@
             android:foregroundServiceType="location"/>
 
         <activity
-            android:name=".CameraActivity"
+            android:name=".model.CameraActivity"
             android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".ShowImageActivity"
+            android:name=".view.ShowImageActivity"
             android:exported="false"
             android:label="@string/title_activity_show_image" />
         <activity
-            android:name=".GalleryActivity"
+            android:name=".view.GalleryActivity"
             android:exported="true" >
 
         </activity>

@@ -5,17 +5,20 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.GalleryActivity
 import com.example.week_5B_solution.model.LocationService
-import com.example.week_5B_solution.viewmodel.LocationViewModel
+import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.example.week_5B_solution.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -25,6 +28,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
+import com.example.week_5B_solution.model.CameraActivity
+import com.example.week_5B_solution.model.ImageData
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 
@@ -33,7 +38,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
-    private var locationViewModel: LocationViewModel? = null
+    private var appViewModel: AppViewModel? = null
+
+
+    var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
+        val photo_uri = result.data?.extras?.getString("uri")
+
+        photo_uri?.let{
+            val uri = Uri.parse(photo_uri)
+
+            val imageData = ImageData(
+                title = "Add Title Here",
+                description = "Add Description Here",
+                imagePath = uri.toString(),
+                pathID = pathNumber!!
+            )
+            this.appViewModel!!.addImage(imageData, uri)
+
+
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +66,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        this.locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
+        this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+
+
+        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
+            currentPath ->
+
+            pathNumber = currentPath
+        })
 
 
         // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
@@ -54,29 +85,34 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
+        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.capture_image_fab)
+
+        cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
+            val intent = Intent(this, CameraActivity::class.java)
+            pickFromCamera.launch(intent)
+        })
+
+        cameraPickerFab.hide()
+
         controlLocationBtn.setOnClickListener{ button ->
 
             if(controlLocationBtn.text == getString(R.string.start)) {
-                if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != GalleryActivity.GRANTED &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != GalleryActivity.GRANTED
-                ){
-                    ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-                        GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION
-                    )
+                if (!locationPermissionsGranted()){
+                    requestLocationPermissions()
+
                 } else {
                     controlLocationBtn.text  = getString(R.string.stop)
                     startLocationService()
+                    cameraPickerFab.show()
 
-                    this.locationViewModel!!.generateNewPath()
-
+                    this.appViewModel!!.generateNewPath()
 
                 }
 
             } else if (controlLocationBtn.text == getString(R.string.stop)) {
                 controlLocationBtn.text = getString(R.string.start)
                 stopLocationService()
+                cameraPickerFab.hide()
             }
 
         }
@@ -87,7 +123,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val intent = Intent(applicationContext, GalleryActivity::class.java)
             startActivity(intent)
         }
+
+
+
+
+
     }
+
+
+
+    private fun locationPermissionsGranted() = (ContextCompat.checkSelfPermission(this,
+        Manifest.permission.ACCESS_COARSE_LOCATION) == GalleryActivity.GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == GalleryActivity.GRANTED)
+
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+            GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION)
+
+    }
+
 
     private fun isLocationServiceRunning(): Boolean {
 
@@ -126,6 +182,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -137,6 +195,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
+        requestLocationPermissions()
         mMap = googleMap
 
         mMap.isMyLocationEnabled = true
@@ -147,5 +206,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
+
+    companion object{
+        var pathNumber: Int? = null
     }
 }

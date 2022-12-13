@@ -8,20 +8,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.media.Image
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
-import com.example.week_5B_solution.data.*
-import com.example.week_5B_solution.repository.LocationRepository
-import com.example.week_5B_solution.view.MapActivity
-import com.example.week_5B_solution.viewmodel.LocationViewModel
+import com.example.week_5B_solution.model.*
 import com.google.android.gms.location.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -101,7 +94,7 @@ class LocationService: Service() {
                 val lat = location.latitude
                 val long = location.longitude
 
-                val currentPath = dbPathDao.getLatestPathNum()
+                val currentPath = dbPathDao.getCurrentPathNum()
 
                 dbLatLngDataDao.insert(LatLngData(lat = lat, lng = long, pathID = currentPath))
 

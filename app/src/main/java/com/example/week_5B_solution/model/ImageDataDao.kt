@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.data
+package com.example.week_5B_solution.model
 
 import androidx.room.Dao
 import androidx.room.Delete

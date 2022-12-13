@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.data
+package com.example.week_5B_solution.model
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -20,14 +20,12 @@ interface LatLngDataDao {
     @Delete
     suspend fun delete(latLngData: LatLngData)
 
-    @Query("Select * from latlng")
-    fun getLatLng(): LiveData<List<LatLngData>>?
+    @Query("Select * from latlng where pathID = :pathID ORDER by id DESC LIMIT 1")
+    fun getLatLng(pathID: Int): LiveData<LatLngData>?
 
     // Useful for tracking Entities
     @Query("Select * from latlng Where id = :id")
     suspend fun getItem(id: Int): LatLngData
-
-
 
 
 
