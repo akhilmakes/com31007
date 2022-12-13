@@ -18,7 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.model.LocationService
+import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.example.week_5B_solution.R
 
@@ -29,8 +29,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
-import com.example.week_5B_solution.model.CameraActivity
-import com.example.week_5B_solution.model.ImageData
+import com.example.week_5B_solution.model.*
+import com.google.android.gms.common.config.GservicesValue.value
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 

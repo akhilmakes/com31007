@@ -30,7 +30,7 @@
         android:theme="@style/Theme.Week_4_solution"
         tools:targetApi="31">
         <activity
-            android:name=".PathDetailActivity"
+            android:name=".view.PathDetailActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

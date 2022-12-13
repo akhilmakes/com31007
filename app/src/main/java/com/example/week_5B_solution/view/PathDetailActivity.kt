@@ -1,10 +1,9 @@
-package com.example.week_5B_solution
+package com.example.week_5B_solution.view
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
+import com.example.week_5B_solution.R
 
 class PathDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
