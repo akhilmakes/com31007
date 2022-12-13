@@ -101,13 +101,15 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val polylineOptions = PolylineOptions()
 
+        Log.d("Detail", "result is $result")
+
         for (i in result){
             polylineOptions.add(LatLng(i.lat, i.lng))
             Log.d("Detail", result.toString())
         }
 
         mMap.addPolyline(polylineOptions)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(pathLocation))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 20f))
 
     }
 
