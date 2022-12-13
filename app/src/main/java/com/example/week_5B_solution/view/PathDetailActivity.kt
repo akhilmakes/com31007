@@ -93,7 +93,7 @@ class PathDetailActivity : AppCompatActivity() {
     }
 
     fun onViewHolderItemClick(position: Int) {
-        val intent = Intent(this, ShowImageActivity::class.java)
+        val intent = Intent(this, ShowPathImageActivity::class.java)
         intent.putExtra("position", position)
         // Start the ShowImageActivity from the ActivityResultContract registered to handle
         // the result when the Activity returns

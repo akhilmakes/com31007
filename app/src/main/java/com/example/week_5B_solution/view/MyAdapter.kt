@@ -2,6 +2,7 @@ package com.example.week_5B_solution.view
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -145,7 +146,6 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
             // the listener is implemented in MainActivity
 
             (context as GalleryActivity).onViewHolderItemClick(position)
-
 
         })
     }

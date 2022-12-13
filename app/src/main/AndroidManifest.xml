@@ -71,6 +71,9 @@
             android:exported="true" >
 
         </activity>
+
+        <activity android:name=".view.ShowPathImageActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>
