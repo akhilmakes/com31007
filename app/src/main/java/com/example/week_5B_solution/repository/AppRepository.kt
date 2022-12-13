@@ -5,14 +5,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.model.*
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AppRepository(application: Application) {
     private var dbPathDao: PathDao? = null
     private var dbLatLngDataDao: LatLngDataDao? = null
     private var dbImageDataDao: ImageDataDao? = null
+    private lateinit var pathLatLngList : List<LatLngData>
+    private lateinit var LatLngForMarkerList : List<LocationTitle>
 
     init {
         dbPathDao = (application as ImageApplication)
@@ -80,6 +84,17 @@ class AppRepository(application: Application) {
     }
     //Functions to Access/Update LatLngData Table
 
+    suspend fun getAllLatLng(id : Int) : List<LatLngData>{
+        runBlocking {
+            launch(Dispatchers.Default){
+                pathLatLngList = dbLatLngDataDao!!.getItem(id)
+            }
+
+        }
+
+        return pathLatLngList
+    }
+
     //Functions to Access/Update ImageData Table
 
     suspend fun insertImage(imageData: ImageData){
@@ -110,6 +125,15 @@ class AppRepository(application: Application) {
 
     suspend fun generateNewPath(){
         InsertAsyncTaskPath(dbPathDao).insertInBackground(Path(title = "Add title here"))
+    }
+
+    suspend fun getOneLatLngFromPath() : List<LocationTitle>{
+        runBlocking {
+            launch(Dispatchers.Default) {
+                LatLngForMarkerList = dbLatLngDataDao!!.getOneLatLngFromPath()
+            }
+        }
+        return LatLngForMarkerList
     }
 
 }

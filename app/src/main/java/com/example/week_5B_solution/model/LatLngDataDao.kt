@@ -16,15 +16,15 @@ interface LatLngDataDao {
     suspend fun delete(latLngData: LatLngData)
 
     @Query("Select * from latlng where pathID = :pathID ORDER by id DESC LIMIT 1")
-    fun getLatLng(pathID: Int): LiveData<LatLngData>?
+    fun getLatLng(pathID: Int): LatLngData
 
     // Useful for tracking Entities
-    @Query("Select * from latlng Where id = :id")
-    suspend fun getItem(id: Int): LatLngData
+    @Query("Select * from latlng Where pathID = :id")
+    fun getItem(id: Int): List<LatLngData>
 
 
     @Query("select * from latlng A LEFT JOIN path B On pathID = pathID group by pathID")
-    fun getOnePathData(): LiveData<List<LocationTitle>>
+    fun getOneLatLngFromPath(): List<LocationTitle>
 
 
 
