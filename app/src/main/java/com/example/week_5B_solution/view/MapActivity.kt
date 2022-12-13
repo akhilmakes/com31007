@@ -88,7 +88,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
 
         initDataDao()
-        // myLatDataset.add(LatData(lat = 33.2, lng = 45.6))
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -207,34 +206,59 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
-       var markerList = dbLatLngDataDao.getOnePathData()
+       var markerList = this.appViewModel!!.getOneLatLngFromPath()
 
-        markerList.observe(this) { value ->
-            for (i in value) {
-                Log.d("Marker", i.toString())
-                //Log.d("Marker", i.title)
+        for (i in markerList) {
+            Log.d("Marker", i.toString())
+            //Log.d("Marker", i.title)
 //               Log.d("Marker", i.pathID.toString())
-                mMap.addMarker(
-                    MarkerOptions()
-                        .position(LatLng(i.lat, i.lng))
-                        .title(i.title)
-                        .snippet(i.pathID.toString())
-                )
+            mMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(i.lat, i.lng))
+                    .title(i.title)
+                    .snippet(i.pathID.toString())
+            )
 
-                mMap.setOnMarkerClickListener {marker->
-                    var intent = Intent(this, PathDetailActivity::class.java)
-                    //Log.d("Extra", i.toString())
-                    intent.putExtra("title", marker.title)
-                    intent.putExtra("pathID", marker.snippet.toString().toInt())
-                    Log.d("Extra", marker.title!!)
-                    Log.d("Extra", marker.snippet!!)
-                    startActivity(intent)
+            mMap.setOnMarkerClickListener {marker->
+                var intent = Intent(this, PathDetailActivity::class.java)
+                //Log.d("Extra", i.toString())
+                intent.putExtra("title", marker.title)
+                intent.putExtra("pathID", marker.snippet.toString().toInt())
+                Log.d("Extra", marker.title!!)
+                Log.d("Extra", marker.snippet!!)
+                startActivity(intent)
 
-                    true
-                }
-
+                true
             }
+
         }
+
+//        markerList.observe(this) { value ->
+//            for (i in value) {
+//                Log.d("Marker", i.toString())
+//                //Log.d("Marker", i.title)
+////               Log.d("Marker", i.pathID.toString())
+//                mMap.addMarker(
+//                    MarkerOptions()
+//                        .position(LatLng(i.lat, i.lng))
+//                        .title(i.title)
+//                        .snippet(i.pathID.toString())
+//                )
+//
+//                mMap.setOnMarkerClickListener {marker->
+//                    var intent = Intent(this, PathDetailActivity::class.java)
+//                    //Log.d("Extra", i.toString())
+//                    intent.putExtra("title", marker.title)
+//                    intent.putExtra("pathID", marker.snippet.toString().toInt())
+//                    Log.d("Extra", marker.title!!)
+//                    Log.d("Extra", marker.snippet!!)
+//                    startActivity(intent)
+//
+//                    true
+//                }
+//
+//            }
+//        }
 
 
         // Add a marker in Sydney and move the camera

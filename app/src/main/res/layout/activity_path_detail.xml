@@ -15,7 +15,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        tools:context=".view.MapActivity"/>
+        tools:context=".view.PathDetailActivity"/>
 
     <TextView
         android:layout_width="300dp"
