@@ -5,21 +5,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.model.*
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.IdentityHashMap
 
 class AppRepository(application: Application) {
     private var dbPathDao: PathDao? = null
     private var dbLatLngDataDao: LatLngDataDao? = null
     private var dbImageDataDao: ImageDataDao? = null
     private lateinit var pathLatLngList : List<LatLngData>
-    private lateinit var LatLngForMarkerList : List<LocationTitle>
+    private lateinit var LatLngForMarkerList : List<LatLngData>
     private lateinit var LatLngForCamera : LatLngData
 
     private var pathImages: List<ImageData>? = null
+
 
     init {
         dbPathDao = (application as ImageApplication)
@@ -146,13 +147,21 @@ class AppRepository(application: Application) {
         InsertAsyncTaskPath(dbPathDao).insertInBackground(Path(title = "Add title here"))
     }
 
-    fun getOneLatLngFromPath() : List<LocationTitle>{
+    fun getPathForID(id: Int): Path {
+        lateinit var pathForID : Path
+
         runBlocking {
             launch(Dispatchers.Default) {
-                LatLngForMarkerList = dbLatLngDataDao!!.getOneLatLngFromPath()
+                pathForID = dbPathDao!!.getPath(id)
             }
         }
-        return LatLngForMarkerList
+        return pathForID
+
+    }
+
+    fun getOneLatLngFromPath() : LiveData<List<LatLngData>>{
+
+        return dbLatLngDataDao!!.getALatLngFromPath()
     }
 
     fun getLatLngForCamera(id : Int) : LatLngData {

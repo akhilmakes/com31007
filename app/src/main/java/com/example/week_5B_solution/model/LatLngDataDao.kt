@@ -28,5 +28,9 @@ interface LatLngDataDao {
     fun getOneLatLngFromPath(): List<LocationTitle>
 
 
+    @Query("select * from latlng GROUP BY pathID")
+    fun getALatLngFromPath(): LiveData<List<LatLngData>>
+
+
 
 }

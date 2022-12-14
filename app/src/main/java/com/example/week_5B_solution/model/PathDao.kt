@@ -22,4 +22,7 @@ interface PathDao {
     @Query("Select id from path ORDER BY id DESC LIMIT 1")
     fun getCurrentPathNum(): Int
 
+    @Query("Select * from path where id = :id")
+    fun getPath(id: Int): Path
+
 }

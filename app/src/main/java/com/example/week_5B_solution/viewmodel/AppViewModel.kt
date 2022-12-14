@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.model.LatLngData
 import com.example.week_5B_solution.model.LocationTitle
+import com.example.week_5B_solution.model.Path
 import com.example.week_5B_solution.repository.AppRepository
 import kotlinx.coroutines.launch
 
@@ -23,14 +24,17 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
     //private var pathData: List<LatLngData>
     var allLatLngList : List<LatLngData>? = null
 
-    var markerDataList : List<LocationTitle>? = null
+    var markerDataList : LiveData<List<LatLngData>>? = null
 
     var cameraLatLng : LatLngData? = null
+
+    var pathForId: Path? = null
 
 
     init {
         currentPath = appRepository.getPathNum()
-        // pathData = appRepository.getAllLatLng()
+
+        markerDataList = appRepository.getOneLatLngFromPath()
     }
 
 
@@ -71,6 +75,13 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         return this.currentPath
     }
 
+    fun getPathForID(id: Int): Path{
+
+        viewModelScope.launch { pathForId = appRepository.getPathForID(id) }
+
+        return pathForId!!
+    }
+
     fun getAllLatLng(id : Int) : List<LatLngData>{
         viewModelScope.launch {
             allLatLngList = appRepository.getAllLatLng(id)
@@ -78,10 +89,8 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         return allLatLngList!!
     }
 
-    fun getOneLatLngFromPath() : List<LocationTitle>{
-        viewModelScope.launch{
-            markerDataList = appRepository.getOneLatLngFromPath()
-        }
+    fun getOneLatLngFromPath() : LiveData<List<LatLngData>>{
+
         return markerDataList!!
     }
 

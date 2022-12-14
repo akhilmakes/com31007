@@ -87,6 +87,41 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             pathNumber = currentPath
         })
 
+        this.appViewModel!!.getOneLatLngFromPath().observe(this, Observer{ list ->
+
+            for (i in list){
+
+                val pathForID = this.appViewModel!!.getPathForID(i.pathID!!)
+
+                Log.d("Marker", i.toString())
+                Log.d("Marker", i.pathID.toString())
+                Log.d("Marker", pathForID.title)
+
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(i.lat, i.lng))
+                        .title(pathForID.title)
+                        .snippet(pathForID.id.toString())
+                )
+
+
+
+                mMap.setOnMarkerClickListener {marker->
+                    val intent = Intent(this, PathDetailActivity::class.java)
+                    //Log.d("Extra", i.toString())
+                    intent.putExtra("title", marker.title)
+                    intent.putExtra("pathID", marker.snippet.toString().toInt())
+                    Log.d("Extra", marker.title!!)
+                    Log.d("Extra", marker.snippet!!)
+                    startActivity(intent)
+
+                    true
+                }
+
+            }
+
+        })
+
         initDataDao()
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -205,33 +240,36 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-
-       var markerList = this.appViewModel!!.getOneLatLngFromPath()
-
-        for (i in markerList) {
-            Log.d("Marker", i.toString())
-            //Log.d("Marker", i.title)
-//               Log.d("Marker", i.pathID.toString())
-            mMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(i.lat, i.lng))
-                    .title(i.title)
-                    .snippet(i.pathID.toString())
-            )
-
-            mMap.setOnMarkerClickListener {marker->
-                var intent = Intent(this, PathDetailActivity::class.java)
-                //Log.d("Extra", i.toString())
-                intent.putExtra("title", marker.title)
-                intent.putExtra("pathID", marker.snippet.toString().toInt())
-                Log.d("Extra", marker.title!!)
-                Log.d("Extra", marker.snippet!!)
-                startActivity(intent)
-
-                true
-            }
-
-        }
+//      val markerList = this.appViewModel!!.getOneLatLngFromPath()
+//        for (i in markerList) {
+//
+//            val pathForID = this.appViewModel!!.getPathForID(i.pathID!!)
+//
+//            Log.d("Marker", i.toString())
+//            Log.d("Marker", i.pathID.toString())
+//            Log.d("Marker", pathForID.title)
+//            mMap.addMarker(
+//                MarkerOptions()
+//                    .position(LatLng(i.lat, i.lng))
+//                    .title(pathForID.title)
+//                    .snippet(pathForID.id.toString())
+//            )
+//
+//
+//
+//            mMap.setOnMarkerClickListener {marker->
+//                var intent = Intent(this, PathDetailActivity::class.java)
+//                //Log.d("Extra", i.toString())
+//                intent.putExtra("title", marker.title)
+//                intent.putExtra("pathID", marker.snippet.toString().toInt())
+//                Log.d("Extra", marker.title!!)
+//                Log.d("Extra", marker.snippet!!)
+//                startActivity(intent)
+//
+//                true
+//            }
+//
+//        }
 
 
         // Add a marker in Sydney and move the camera
@@ -242,5 +280,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object{
         var pathNumber: Int? = null
+
+        var pathList: List<LatLngData>? = null
     }
 }
