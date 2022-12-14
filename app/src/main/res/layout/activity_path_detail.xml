@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
         android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="40sp"
+        android:layout_marginLeft="20dp"
+        android:textSize="35sp"
         android:text=""
         android:id="@+id/pathTitle"
         />
@@ -22,7 +22,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="380dp"
         android:layout_height="300dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="65dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         tools:context=".view.PathDetailActivity"/>
@@ -44,6 +44,16 @@
         android:layout_margin="16dp"
         app:srcCompat="@android:drawable/ic_menu_add"
         android:contentDescription="@string/action_settings"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/editPathButton"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_margin="10dp"
+        android:background="@drawable/ic_baseline_mode_edit_24"
+        android:contentDescription="@string/action_settings" />
+
 
 
 
