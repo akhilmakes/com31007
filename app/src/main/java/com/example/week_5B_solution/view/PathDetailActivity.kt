@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +30,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -145,7 +149,34 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         })
 
+        val editPathTitleBtn: AppCompatButton = findViewById(R.id.editPathTitleBtn)
+
+//        binding.editPathTitleBtn.setOnClickListener {
+//            onUpdateButtonClickListener(it, position)
+//        }
+
+
+
     }
+
+//    private fun onUpdateButtonClickListener(view: View, position: Int){
+//        // Update the data in the model back. This is a lot of work, back and forth!
+//        MyAdapter.items[position].title = binding.editTextTitle.text.toString()
+//        MyAdapter.items[position].description = binding.editTextDescription.text.toString()
+//
+//        this.appViewModel!!.updateImage(MyAdapter.items[position])
+//
+//        runBlocking {
+//            launch(Dispatchers.IO) {
+//
+//                // Start an intent to to tell the calling activity an update happened.
+//                val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
+//                intent.putExtra("updated",true)
+//                setResult(RESULT_OK,intent)
+//                finish()
+//            }
+//        }
+//    }
 
 
     fun initPathImages(id: Int){
@@ -187,6 +218,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         mMap.addPolyline(polylineOptions)
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 15f))
 
     }

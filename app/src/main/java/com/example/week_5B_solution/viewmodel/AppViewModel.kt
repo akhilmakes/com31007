@@ -91,4 +91,10 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         }
         return cameraLatLng!!
     }
+
+//    fun updatePathTitle(title:String, id:Int){
+//        viewModelScope.launch {
+//            appRepository.updatePathTitle(title, id)
+//        }
+//    }
 }

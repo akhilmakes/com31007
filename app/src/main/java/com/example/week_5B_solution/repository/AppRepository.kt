@@ -1,6 +1,7 @@
 package com.example.week_5B_solution.repository
 
 import android.app.Application
+import android.graphics.DiscretePathEffect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.week_5B_solution.ImageApplication
@@ -163,5 +164,13 @@ class AppRepository(application: Application) {
         }
         return LatLngForCamera
     }
+
+//    fun updatePathTitle(title: String, id : Int) {
+//        runBlocking {
+//            launch(Dispatchers.Default){
+//                dbPathDao!!.updateTitle(title, id)
+//            }
+//        }
+//    }
 
 }

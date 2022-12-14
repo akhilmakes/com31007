@@ -22,4 +22,7 @@ interface PathDao {
     @Query("Select id from path ORDER BY id DESC LIMIT 1")
     fun getCurrentPathNum(): Int
 
+//    @Query("update path set title = :title where id=:id")
+//    fun updateTitle(title:String, id:Int)
+
 }

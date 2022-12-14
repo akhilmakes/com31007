@@ -27,19 +27,28 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.example.week_5B_solution.model.*
 import com.google.android.gms.common.config.GservicesValue.value
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onEach
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    // FOR THE TRACKING HERE
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
     private var appViewModel: AppViewModel? = null
+
+    private lateinit var locationClient: LocationClient
+
+    private val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
 
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
@@ -80,6 +89,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
+        locationClient = LocationClient(
+            applicationContext,
+            LocationServices.getFusedLocationProviderClient(applicationContext)
+        )
+
 
         this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
             currentPath ->
@@ -94,9 +108,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
-        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.capture_image_fab)
+
+        val cameraPickerFab: FloatingActionButton = findViewById(R.id.capture_image_fab)
 
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
             val intent = Intent(this, CameraActivity::class.java)
@@ -188,56 +202,34 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
+        // Do live tracking here
+
         requestLocationPermissions()
+
         mMap = googleMap
+        val polylineOptions = PolylineOptions()
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
-       var markerList = this.appViewModel!!.getOneLatLngFromPath()
 
-        for (i in markerList) {
-            Log.d("Marker", i.toString())
-            //Log.d("Marker", i.title)
-//               Log.d("Marker", i.pathID.toString())
-            mMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(i.lat, i.lng))
-                    .title(i.title)
-                    .snippet(i.pathID.toString())
-            )
+        locationClient.receiveLocationUpdates(20000)
+            .catch { e -> e.printStackTrace() }
+            .onEach{ location ->
+                val lat = location.latitude
+                val long = location.longitude
+                polylineOptions.add(LatLng(lat, long))
 
-            mMap.setOnMarkerClickListener {marker->
-                var intent = Intent(this, PathDetailActivity::class.java)
-                //Log.d("Extra", i.toString())
-                intent.putExtra("title", marker.title)
-                intent.putExtra("pathID", marker.snippet.toString().toInt())
-                Log.d("Extra", marker.title!!)
-                Log.d("Extra", marker.snippet!!)
-                startActivity(intent)
-
-                true
+                mMap.addPolyline(polylineOptions)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, long), 15f))
             }
 
-        }
-
-
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        // mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val sheffield = LatLng(53.37, -1.462)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sheffield))
     }
 
     companion object{
