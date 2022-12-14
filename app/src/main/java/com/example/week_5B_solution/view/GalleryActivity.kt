@@ -2,7 +2,9 @@ package com.example.week_5B_solution.view
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,14 +19,18 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
+import com.example.week_5B_solution.databinding.ActivityGalleryBinding
+import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.example.week_5B_solution.model.CameraActivity
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.model.ImageDataDao
@@ -35,6 +41,9 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 
 class GalleryActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityGalleryBinding
+
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 //    private lateinit var mLayoutManager: RecyclerView.LayoutManager
@@ -107,6 +116,9 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
+        binding = ActivityGalleryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         initData()
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
@@ -171,11 +183,55 @@ class GalleryActivity : AppCompatActivity() {
 
 
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
+
+        /*
+        menu?.findItem(R.id.menu_search)
+            ?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener){
+                override fun onMenuItemActionExpand(p0: MenuItem?): Boolean{
+                    return true
+                }
+                override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                    invalidateOptionsMenu()
+                    return true
+                }
+            })
+
+        */
+
+
+        // associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            (menu?.findItem(R.id.menu_search)?.actionView as SearchView).apply {
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
+            this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                //operate when tap on search button
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
+                //operate when type some words
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    if (newText != null){
+                        if (newText.isNotEmpty()){
+
+                           // binding.flMainSearchResult.visibility = View.VISIBLE
+                          //  MyAdapter.filter.filter(newText)
+                        } else {
+                          //  binding.flMainSearchResult.visibility = View.GONE
+                        }
+                    }
+                    return false
+                }
+            })
+        }
+
         return true
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will

@@ -20,4 +20,3 @@ data class ImageData(
     @ColumnInfo(name="thumbnail_filename") var thumbnail: String? = null,
     @ColumnInfo(name= "pathID") val pathID: Int
 )
-{ }

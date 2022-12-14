@@ -1,5 +1,6 @@
 package com.example.week_5B_solution.view
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,8 @@ import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
@@ -23,11 +26,14 @@ import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
-class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
+class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder>, Filterable {
     private lateinit var context: Context
 
-
+    val searchDataAll = ArrayList<ImageData>(items)
+    var searchResultItems:MutableList<ImageData> = items as MutableList<ImageData>
     //region constructors
 
     constructor(items: List<ImageData>) {
@@ -293,6 +299,39 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
 //        var title: TextView = itemView.findViewById<View>(R.id.title) as TextView
 //        var preview: TextView = itemView.findViewById<View>(R.id.preview) as TextView
         var imageView: ImageView = itemView.findViewById<View>(R.id.image_item) as ImageView
+
+    }
+
+    override fun getFilter(): Filter {
+        return exampleFilter
+    }
+    private val exampleFilter: Filter = object : Filter(){
+        //Automatic on background thread
+        override fun performFiltering(constraint: CharSequence): FilterResults {
+            val filteredList: MutableList<ImageData> = java.util.ArrayList<ImageData>()
+            if (constraint.isEmpty()){
+                filteredList.addAll(searchDataAll)
+            } else {
+                val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim { it <= ' '}
+                for (item in searchDataAll){
+                    //filter setting
+                    if (item.title.lowercase(Locale.getDefault()).contains(filterPattern)){
+                        filteredList.add(item)
+                    }
+                }
+            }
+            val results = FilterResults()
+            results.values = filteredList
+            return results
+        }
+
+        //Automatic on UI thread
+        @SuppressLint("NotifyDataSetChanged")
+        override fun publishResults(constraint: CharSequence, results: FilterResults) {
+            searchResultItems .clear()
+            searchResultItems .addAll(results.values as Collection<ImageData>)
+            notifyDataSetChanged()
+        }
 
     }
 
