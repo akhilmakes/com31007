@@ -7,9 +7,14 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.week_5B_solution.ImageApplication
@@ -21,7 +26,7 @@ import kotlinx.coroutines.flow.*
 
 
 
-class LocationService: Service() {
+class LocationService: Service(){
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -30,6 +35,8 @@ class LocationService: Service() {
 
     private lateinit var dbLatLngDataDao: LatLngDataDao
     private lateinit var dbPathDao: PathDao
+
+    private lateinit var barometerEventListener: SensorEventListener
 
 
 
@@ -42,6 +49,27 @@ class LocationService: Service() {
             applicationContext,
             LocationServices.getFusedLocationProviderClient(applicationContext)
         )
+
+        val sensorManager = applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+
+        barometerEventListener = object : SensorEventListener{
+            override fun onSensorChanged(event: SensorEvent?) {
+                currentPressureReading = event!!.values[0]
+
+                Log.d("SENSOR", "$currentPressureReading")
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            }
+        }
+
+        sensorManager.also {
+            it.registerListener(barometerEventListener, sensor,
+            SensorManager.SENSOR_DELAY_NORMAL)
+
+        }
     }
 
 
@@ -159,6 +187,8 @@ class LocationService: Service() {
         var currentLocation: Location? = null
 
         var currentPath: Path? = null
+
+        var currentPressureReading: Float? = null
 
     }
 }
