@@ -217,11 +217,10 @@ class GalleryActivity : AppCompatActivity() {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     if (newText != null){
                         if (newText.isNotEmpty()){
-
-                           // binding.flMainSearchResult.visibility = View.VISIBLE
-                          //  MyAdapter.filter.filter(newText)
+                            binding.root.visibility = View.VISIBLE
+                            MyAdapter.filter.filter(newText)
                         } else {
-                          //  binding.flMainSearchResult.visibility = View.GONE
+                            binding.root.visibility = View.GONE
                         }
                     }
                     return false
