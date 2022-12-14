@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
@@ -11,18 +12,44 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.example.week_5B_solution.databinding.ActivityMapsBinding
+import com.example.week_5B_solution.databinding.ActivityPathDetailBinding
+import com.example.week_5B_solution.model.LatLngData
+import com.example.week_5B_solution.model.LatLngDataDao
+import com.example.week_5B_solution.model.PathDao
+import com.example.week_5B_solution.viewmodel.AppViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class PathDetailActivity : AppCompatActivity() {
+class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private lateinit var mMap: GoogleMap
+    private lateinit var binding: ActivityPathDetailBinding
+    private var appViewModel: AppViewModel? = null
+
+    private lateinit var dbLatLngDataDao: LatLngDataDao
+    private lateinit var dbPathDao : PathDao
+
+    private lateinit var pathLatLngList : List<LatLngData>
+    private lateinit var result : List<LatLngData>
+    private lateinit var pathLocation: LatLng
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
-
-    private var appViewModel: AppViewModel? = null
 
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
 
@@ -81,22 +108,48 @@ class PathDetailActivity : AppCompatActivity() {
 
 
     @SuppressLint("MissingInflatedId", "SetTextI18n")
+
+    private fun initDataDao(){
+        dbLatLngDataDao = (this@PathDetailActivity.application as ImageApplication)
+            .databaseObj.latLngDataDao()
+        dbPathDao = (this@PathDetailActivity.application as ImageApplication)
+            .databaseObj.pathDao()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_path_detail)
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
-        val pathTitle = findViewById<TextView>(R.id.pathTitle)
+        binding = ActivityPathDetailBinding.inflate(layoutInflater)
+        //setContentView(R.layout.activity_path_detail)
+        setContentView(binding.root)
 
-        val title = this@PathDetailActivity.intent.getStringExtra("title")
-        val pathID = this@PathDetailActivity.intent.getIntExtra("pathID",-1)
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map2) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        initDataDao()
+       
+        var title = intent.getStringExtra("title")
+        var pathID = intent.getIntExtra("pathID",-1)
+        setContentView(R.layout.activity_path_detail)
+
+        var cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
+        pathLocation = LatLng(cameraLatLng.lat, cameraLatLng.lng)
+
+        //result = initPath(pathID)
+        result = this.appViewModel!!.getAllLatLng(pathID)
+
+
+        val pathTitle = findViewById<TextView>(R.id.pathTitle).apply {
+            text = title
+        }
 
         pathNumber = pathID
 
         initPathImages(pathID)
 
-        pathTitle.setText("$title")
 
 
         mRecyclerView = findViewById<RecyclerView>(R.id.pathImageList)
@@ -128,6 +181,42 @@ class PathDetailActivity : AppCompatActivity() {
         // Start the ShowImageActivity from the ActivityResultContract registered to handle
         // the result when the Activity returns
         showImageActivityResultContract.launch(intent)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(googleMap: GoogleMap) {
+        // requestLocationPermissions()
+        mMap = googleMap
+
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+        var pathID = intent.getIntExtra("pathID",-1)
+
+        val sydney = LatLng(-34.0, 151.0)
+
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+
+        // var pathLatLngList = dbLatLngDataDao.getItem(pathID)
+
+
+        //Log.d("Detail", "pathID is $pathID.toString()")
+        //Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
+        //Log.d("Detail", "camera lng value is ${cameraLatLng.lng}")
+
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(cameraLatLng.lat, cameraLatLng.lng)))
+
+        val polylineOptions = PolylineOptions()
+
+        Log.d("Detail", "result is $result")
+
+        for (i in result){
+            polylineOptions.add(LatLng(i.lat, i.lng))
+            Log.d("Detail", result.toString())
+        }
+
+        mMap.addPolyline(polylineOptions)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 20f))
+
     }
 
     companion object{
