@@ -18,12 +18,10 @@ import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.example.week_5B_solution.databinding.ActivityPathDetailBinding
 import com.example.week_5B_solution.model.LatLngData
 import com.example.week_5B_solution.model.LatLngDataDao
 import com.example.week_5B_solution.model.PathDao
-import com.example.week_5B_solution.viewmodel.AppViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -31,9 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+
 
 class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
