@@ -102,51 +102,32 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-
-    @SuppressLint("MissingInflatedId", "SetTextI18n")
-
-    private fun initDataDao(){
-        dbLatLngDataDao = (this@PathDetailActivity.application as ImageApplication)
-            .databaseObj.latLngDataDao()
-        dbPathDao = (this@PathDetailActivity.application as ImageApplication)
-            .databaseObj.pathDao()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
         binding = ActivityPathDetailBinding.inflate(layoutInflater)
-        //setContentView(R.layout.activity_path_detail)
         setContentView(binding.root)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map2) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        initDataDao()
        
-        var title = intent.getStringExtra("title")
-        var pathID = intent.getIntExtra("pathID",-1)
-        setContentView(R.layout.activity_path_detail)
+        val title = intent.getStringExtra("title")
+        val pathID = intent.getIntExtra("pathID",-1)
 
-        var cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
+
+        val cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
         pathLocation = LatLng(cameraLatLng.lat, cameraLatLng.lng)
 
-        //result = initPath(pathID)
         result = this.appViewModel!!.getAllLatLng(pathID)
 
-
-        val pathTitle = findViewById<TextView>(R.id.pathTitle).apply {
+        findViewById<TextView>(R.id.pathTitle).apply {
             text = title
         }
 
         pathNumber = pathID
-
-        initPathImages(pathID)
-
-
 
         mRecyclerView = findViewById<RecyclerView>(R.id.pathImageList)
 
@@ -156,6 +137,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mAdapter = MyPathAdapter(this, myDataset) as RecyclerView.Adapter<RecyclerView.ViewHolder>
         mRecyclerView.adapter = mAdapter
 
+        initPathImages(pathNumber!!)
 
 
         val photoPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openGalleryFab)
@@ -164,6 +146,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         })
 
     }
+
 
     fun initPathImages(id: Int){
         val pathImages = this.appViewModel!!.retrievePathImages(id)
@@ -181,19 +164,12 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        // requestLocationPermissions()
         mMap = googleMap
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        var pathID = intent.getIntExtra("pathID",-1)
-
-        val sydney = LatLng(-34.0, 151.0)
-
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 
         // var pathLatLngList = dbLatLngDataDao.getItem(pathID)
-
 
         //Log.d("Detail", "pathID is $pathID.toString()")
         //Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
@@ -211,7 +187,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         mMap.addPolyline(polylineOptions)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 20f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 15f))
 
     }
 
