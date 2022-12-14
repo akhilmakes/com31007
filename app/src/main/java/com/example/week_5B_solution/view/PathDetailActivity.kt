@@ -9,10 +9,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.viewmodel.AppViewModel
@@ -55,11 +55,37 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             this@PathDetailActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
+            val input = contentResolver.openInputStream(uri)!!
+
+            val exif = ExifInterface(input)
+
+            var lat = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE)
+            var long = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE)
+            val longRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF)
+
+            val date = exif.getAttribute(ExifInterface.TAG_DATETIME)
+
+            if(!lat.isNullOrEmpty()) {
+                lat = parseLatLng(lat)
+            }
+            if(!long.isNullOrEmpty()){
+                long = parseLatLng(long)
+            }
+
+           val latLng = if (longRef == "W"){
+                "$lat, -$long"
+            } else {
+                "$lat, $long"
+            }
+
+
             val imageData = ImageData(
                 title = "Add Title Here",
                 description = "Add Description Here",
                 imagePath = uri.toString(),
-                pathID = pathNumber!!
+                pathID = pathNumber!!,
+                latLng = latLng,
+                dateTime = date
             )
 
             this.appViewModel!!.addImage(imageData, uri)
@@ -99,6 +125,23 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    fun parseLatLng(exifTag: String): String{
+
+        val degrees = exifTag.substring(0, exifTag.indexOf("/"))
+
+        val minutes = exifTag.substring(degrees.length-1, exifTag.indexOf("/"))
+
+        val seconds = exifTag.substring(minutes.length-1, exifTag.indexOf("/"))
+
+        val result = degrees.toDouble() + (minutes.toDouble()/60) + (seconds.toDouble()/3600)
+
+        return result.toString()
+
+
+
+
     }
 
 
@@ -186,9 +229,36 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.d("Detail", result.toString())
         }
 
+        for (images in myDataset){
+
+            val latLngString = images.latLng
+
+            if(latLngString!!.substring(0, latLngString.indexOf(",")) != "null"){
+
+                val latLongPair = getLatLongFromString(latLngString)
+
+                mMap.addMarker(MarkerOptions().position(LatLng(latLongPair[0], latLongPair[1])))
+
+            }
+
+
+
+        }
+
+
+
         mMap.addPolyline(polylineOptions)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 15f))
 
+    }
+
+    fun getLatLongFromString(latLng: String): MutableList<Double> {
+
+        return mutableListOf(
+            latLng.substring(0, latLng.indexOf(",")).toDouble(),
+            latLng.substring(latLng.indexOf(",")+1).toDouble()
+
+        )
     }
 
     companion object{

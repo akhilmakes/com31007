@@ -102,6 +102,8 @@ class LocationService: Service() {
 
                 notificationManager.notify(LOCATION_SERVICE_ID, updatedNotification.build())
 
+
+
             }
             .launchIn(serviceScope)
 

@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.ImageApplication
@@ -48,16 +49,56 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         photo_uri?.let{
             val uri = Uri.parse(photo_uri)
 
+            val input = contentResolver.openInputStream(uri)!!
+
+            val exif = ExifInterface(input)
+
+            var lat = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE)
+            var long = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE)
+            val longRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF)
+
+            val date = exif.getAttribute(ExifInterface.TAG_DATETIME)
+
+            if(!lat.isNullOrEmpty()) {
+                lat = parseLatLng(lat)
+            }
+            if(!long.isNullOrEmpty()){
+                long = parseLatLng(long)
+            }
+
+            val latLng = if (longRef == "W"){
+                "$lat, -$long"
+            } else {
+                "$lat, $long"
+            }
+
+
             val imageData = ImageData(
                 title = "Add Title Here",
                 description = "Add Description Here",
                 imagePath = uri.toString(),
-                pathID = pathNumber!!
+                pathID = pathNumber!!,
+                latLng = latLng,
+                dateTime = date
             )
             this.appViewModel!!.addImage(imageData, uri)
 
 
         }
+    }
+
+    fun parseLatLng(exifTag: String): String{
+
+        val degrees = exifTag.substring(0, exifTag.indexOf("/"))
+
+        val minutes = exifTag.substring(degrees.length-1, exifTag.indexOf("/"))
+
+        val seconds = exifTag.substring(minutes.length-1, exifTag.indexOf("/"))
+
+        val result = degrees.toDouble() + (minutes.toDouble()/60) + (seconds.toDouble()/3600)
+
+        return result.toString()
+
     }
 
     private lateinit var dbLatLngDataDao: LatLngDataDao

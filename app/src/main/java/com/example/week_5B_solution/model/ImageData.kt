@@ -18,6 +18,8 @@ data class ImageData(
     @ColumnInfo(name="image_title") var title: String,
     @ColumnInfo(name="image_description") var description: String? = null,
     @ColumnInfo(name="thumbnail_filename") var thumbnail: String? = null,
+    @ColumnInfo(name="lat_lng_string") var latLng: String? = null,
+    @ColumnInfo(name="date_time") var dateTime: String? = null,
     @ColumnInfo(name= "pathID") val pathID: Int
 )
 { }
