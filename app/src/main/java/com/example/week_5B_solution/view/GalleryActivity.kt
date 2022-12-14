@@ -46,26 +46,7 @@ class GalleryActivity : AppCompatActivity() {
     private var appViewModel: AppViewModel? = null
 
     //region ActivityResultContracts
-    val photoPicker = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let{
-            // https://developer.android.com/training/data-storage/shared/photopicker#persist-media-file-access
-            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            this@GalleryActivity.contentResolver.takePersistableUriPermission(uri, flag)
 
-            val imageData = ImageData(
-                title = "Add Title Here",
-                description = "Add Description Here",
-                imagePath = uri.toString(),
-                pathID = pathNumber!!
-            )
-
-            this.appViewModel!!.addImage(imageData, uri)
-            myDataset.add(imageData)
-
-
-            mRecyclerView.scrollToPosition(myDataset.size - 1)
-        }
-    }
 
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result->
             val photo_uri = result.data?.extras?.getString("uri")
@@ -152,12 +133,7 @@ class GalleryActivity : AppCompatActivity() {
         mAdapter = MyAdapter(this, myDataset) as RecyclerView.Adapter<RecyclerView.ViewHolder>
         mRecyclerView.adapter = mAdapter
 
-        // Start a photo picker Activity from the ActivityResultContract registered to handle
-        // the result when the Activity returns
-        val photoPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openGalleryFab)
-        photoPickerFab.setOnClickListener(View.OnClickListener { view ->
-            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        })
+
 
         // Start the CameraActivity using the ActivityResultContract registered to handle
         // the result when the Activity returns

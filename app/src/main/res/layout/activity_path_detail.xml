@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
+        android:textSize="40sp"
+        android:text=""
+        android:id="@+id/pathTitle"
+        />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map2"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="380dp"
         android:layout_height="300dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="45dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         tools:context=".view.MapActivity"/>
 
-    <include layout="@layout/content_path"/>
 
-    <TextView
-        android:layout_width="300dp"
+    <include layout="@layout/content_path"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="500dp"
-        android:layout_marginRight="200dp"
-        android:layout_marginLeft="200dp"
-        android:textSize="15sp"
-        android:text="Marker"
-        android:id="@+id/markerTest"
+        android:layout_marginTop="390dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
         />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openGalleryFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_menu_add"
+        android:contentDescription="@string/action_settings"/>
 
 
 
