@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -32,10 +33,17 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.example.week_5B_solution.model.*
 import com.google.android.gms.common.config.GservicesValue.value
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    // FOR THE TRACKING HERE
+
+    private lateinit var latLngForPath: List<LatLngData>
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -122,8 +130,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
 
-        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
-            currentPath ->
+        this.appViewModel!!.retrieveCurrentPath().observe(this, Observer { currentPath ->
 
             pathNumber = currentPath
         })
@@ -135,46 +142,51 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
 
-        val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.capture_image_fab)
+        val cameraPickerFab: FloatingActionButton = findViewById(R.id.capture_image_fab)
 
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
             val intent = Intent(this, CameraActivity::class.java)
             pickFromCamera.launch(intent)
         })
 
-        cameraPickerFab.hide()
+        //cameraPickerFab.hide()
+        val stopTrackingButton: Button = findViewById(R.id.stopTrackingBtn)
+        stopTrackingButton.setOnClickListener {
+            val pathInfo = this.appViewModel!!.getPathForID(pathNumber!!)
+            stopTrackingButton.isVisible = false
+            stopLocationService()
 
-        controlLocationBtn.setOnClickListener{ button ->
+            val intent = Intent(this, PathDetailActivity::class.java)
 
-            if(controlLocationBtn.text == getString(R.string.start)) {
-                if (!locationPermissionsGranted()){
-                    requestLocationPermissions()
+            intent.putExtra("title", pathInfo.title)
+            intent.putExtra("pathID", pathNumber)
 
-                } else {
-                    controlLocationBtn.text  = getString(R.string.stop)
-                    startLocationService()
-                    cameraPickerFab.show()
-
-                    this.appViewModel!!.generateNewPath()
-
-                }
-
-            } else if (controlLocationBtn.text == getString(R.string.stop)) {
-                controlLocationBtn.text = getString(R.string.start)
-                stopLocationService()
-                cameraPickerFab.hide()
-            }
-
-        }
-
-        val galleryFab: FloatingActionButton = findViewById(R.id.go_to_gallery_fab)
-
-        galleryFab.setOnClickListener{
-            val intent = Intent(applicationContext, GalleryActivity::class.java)
             startActivity(intent)
+
+            val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page)
+            goToMainPageBtn.setOnClickListener {
+
+                val intent = Intent(this, MainActivity::class.java)
+            }
         }
+
+    }
+
+
+    fun addPolylineToMap(){
+
+        if (pathNumber != null){
+            mMap.addPolyline(drawPath())
+        }
+
+    }
+
+
+    override fun onRestart() {
+        super.onRestart()
+
+        addPolylineToMap()
     }
 
 
@@ -228,57 +240,41 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    fun drawPath():PolylineOptions{
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+        val polylineOptions = PolylineOptions()
+
+        if (pathNumber != null){
+            latLngForPath = this.appViewModel!!.getAllLatLng(pathNumber!!)
+
+
+            for(latLng in latLngForPath){
+
+                polylineOptions.add(LatLng(latLng.lat,latLng.lng))
+
+            }
+        }
+
+
+        return polylineOptions
+
+    }
+
+
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        requestLocationPermissions()
+        // Do live tracking here
         mMap = googleMap
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
-       var markerList = this.appViewModel!!.getOneLatLngFromPath()
-
-        for (i in markerList) {
-            Log.d("Marker", i.toString())
-            //Log.d("Marker", i.title)
-//               Log.d("Marker", i.pathID.toString())
-            mMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(i.lat, i.lng))
-                    .title(i.title)
-                    .snippet(i.pathID.toString())
-            )
-
-            mMap.setOnMarkerClickListener {marker->
-                var intent = Intent(this, PathDetailActivity::class.java)
-                //Log.d("Extra", i.toString())
-                intent.putExtra("title", marker.title)
-                intent.putExtra("pathID", marker.snippet.toString().toInt())
-                Log.d("Extra", marker.title!!)
-                Log.d("Extra", marker.snippet!!)
-                startActivity(intent)
-
-                true
-            }
-
-        }
-
+        addPolylineToMap()
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        // mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val sheffield = LatLng(53.37, -1.462)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sheffield))
     }
 
     companion object{

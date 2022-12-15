@@ -10,4 +10,11 @@
     <string name="title_activity_maps">Map</string>
     <string name="gallery_button">Gallery Button</string>
     <string name="add_image_to_path">Add Image to Path</string>
+    <string name="title_activity_tracking">TrackingActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="tracking">Start Tracking</string>
+    <string name="stop_tracking">Stop Tracking</string>
+    <string name="back_to_tracker">Back to Tracker</string>
+    <string name="view_current_path">View Current Path</string>
+    <string name="back_to_main_page">Back to Main Page</string>
 </resources>

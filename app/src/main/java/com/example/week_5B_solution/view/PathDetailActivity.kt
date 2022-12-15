@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.exifinterface.media.ExifInterface
+import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -161,7 +162,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         val pathID = intent.getIntExtra("pathID",-1)
 
 
-        val cameraLatLng = this.appViewModel!!.getLatLngForCamera(pathID)
+        val cameraLatLng = this.appViewModel!!.getLastLatLng(pathID)
         pathLocation = LatLng(cameraLatLng.lat, cameraLatLng.lng)
 
         result = this.appViewModel!!.getAllLatLng(pathID)
@@ -188,6 +189,21 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         })
 
+        val galleryFab: FloatingActionButton = findViewById(R.id.go_to_gallery_fab)
+
+        galleryFab.setOnClickListener{
+            val intent = Intent(applicationContext, GalleryActivity::class.java)
+            startActivity(intent)
+        }
+
+//        val editPathTitleBtn: AppCompatButton = findViewById(R.id.editPathTitleBtn)
+
+//        binding.editPathTitleBtn.setOnClickListener {
+//            onUpdateButtonClickListener(it, position)
+//        }
+
+
+
     }
 
 
@@ -212,13 +228,6 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-        // var pathLatLngList = dbLatLngDataDao.getItem(pathID)
-
-        //Log.d("Detail", "pathID is $pathID.toString()")
-        //Log.d("Detail", "camera lat value is ${cameraLatLng.lat}")
-        //Log.d("Detail", "camera lng value is ${cameraLatLng.lng}")
-
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(cameraLatLng.lat, cameraLatLng.lng)))
 
         val polylineOptions = PolylineOptions()
 

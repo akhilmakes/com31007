@@ -5,6 +5,11 @@
 
     <uses-feature android:name="android.hardware.camera.any" />
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
@@ -12,11 +17,9 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
 
     <application
         android:name=".ImageApplication"
@@ -29,6 +32,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Week_4_solution"
         tools:targetApi="31">
+
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_KEY}" />
+
         <activity
             android:name=".view.PathDetailActivity"
             android:exported="false">
@@ -36,28 +45,25 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_KEY}" />
-
         <activity
-            android:name=".view.MapActivity"
+            android:name=".view.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <service android:name=".model.LocationService"
-            android:foregroundServiceType="location"/>
+        <service
+            android:name=".model.LocationService"
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".model.CameraActivity"
-            android:exported="false" >
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -68,12 +74,16 @@
             android:label="@string/title_activity_show_image" />
         <activity
             android:name=".view.GalleryActivity"
-            android:exported="true" >
+            android:exported="true" />
+        <activity
+            android:name=".view.ShowPathImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.MapActivity"
+            android:exported="true"
+        />
 
-        </activity>
 
-        <activity android:name=".view.ShowPathImageActivity"
-            android:exported="false"/>
     </application>
 
 </manifest>
