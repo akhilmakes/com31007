@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.week_5B_solution.ImageApplication
@@ -41,6 +42,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // FOR THE TRACKING HERE
 
+    private lateinit var latLngForPath: List<LatLngData>
+
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
@@ -48,7 +51,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var locationClient: LocationClient
 
-    private val controlLocationBtn: Button = findViewById(R.id.control_location_service_btn)
+
 
 
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
@@ -89,17 +92,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
-        locationClient = LocationClient(
-            applicationContext,
-            LocationServices.getFusedLocationProviderClient(applicationContext)
-        )
-
 
         this.appViewModel!!.retrieveCurrentPath().observe(this, Observer {
             currentPath ->
 
             pathNumber = currentPath
         })
+
 
         initDataDao()
 
@@ -109,7 +108,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
 
-
         val cameraPickerFab: FloatingActionButton = findViewById(R.id.capture_image_fab)
 
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
@@ -117,37 +115,53 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             pickFromCamera.launch(intent)
         })
 
-        cameraPickerFab.hide()
+        //cameraPickerFab.hide()
 
-        controlLocationBtn.setOnClickListener{ button ->
+        val stopTrackingButton: Button = findViewById(R.id.stopTrackingBtn)
 
-            if(controlLocationBtn.text == getString(R.string.start)) {
-                if (!locationPermissionsGranted()){
-                    requestLocationPermissions()
 
-                } else {
-                    controlLocationBtn.text  = getString(R.string.stop)
-                    startLocationService()
-                    cameraPickerFab.show()
+        stopTrackingButton.setOnClickListener{
 
-                    this.appViewModel!!.generateNewPath()
+            val pathInfo = this.appViewModel!!.getPathForID(pathNumber!!)
 
-                }
+            stopTrackingButton.isVisible = false
 
-            } else if (controlLocationBtn.text == getString(R.string.stop)) {
-                controlLocationBtn.text = getString(R.string.start)
-                stopLocationService()
-                cameraPickerFab.hide()
-            }
+            stopLocationService()
+
+            val intent = Intent(this, PathDetailActivity::class.java)
+
+            intent.putExtra("title", pathInfo.title)
+            intent.putExtra("pathID", pathNumber)
+
+            startActivity(intent)
+
 
         }
 
-        val galleryFab: FloatingActionButton = findViewById(R.id.go_to_gallery_fab)
+        val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page)
 
-        galleryFab.setOnClickListener{
-            val intent = Intent(applicationContext, GalleryActivity::class.java)
+        goToMainPageBtn.setOnClickListener{
+
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+
+
+    }
+
+    fun addPolylineToMap(){
+
+        if (pathNumber != null){
+            mMap.addPolyline(drawPath())
+        }
+
+    }
+
+
+    override fun onRestart() {
+        super.onRestart()
+
+        addPolylineToMap()
     }
 
 
@@ -201,31 +215,38 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    fun drawPath():PolylineOptions{
+
+        val polylineOptions = PolylineOptions()
+
+        if (pathNumber != null){
+            latLngForPath = this.appViewModel!!.getAllLatLng(pathNumber!!)
+
+
+            for(latLng in latLngForPath){
+
+                polylineOptions.add(LatLng(latLng.lat,latLng.lng))
+
+            }
+        }
+
+
+        return polylineOptions
+
+    }
+
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         // Do live tracking here
-
-        requestLocationPermissions()
-
         mMap = googleMap
-        val polylineOptions = PolylineOptions()
+
 
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
-
-        locationClient.receiveLocationUpdates(20000)
-            .catch { e -> e.printStackTrace() }
-            .onEach{ location ->
-                val lat = location.latitude
-                val long = location.longitude
-                polylineOptions.add(LatLng(lat, long))
-
-                mMap.addPolyline(polylineOptions)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, long), 15f))
-            }
+        addPolylineToMap()
 
         // Add a marker in Sydney and move the camera
         val sheffield = LatLng(53.37, -1.462)

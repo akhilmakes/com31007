@@ -19,6 +19,7 @@ class AppRepository(application: Application) {
     private lateinit var pathLatLngList : List<LatLngData>
     private lateinit var LatLngForMarkerList : List<LocationTitle>
     private lateinit var LatLngForCamera : LatLngData
+    private lateinit var pathForID: Path
 
     private var pathImages: List<ImageData>? = null
 
@@ -88,7 +89,7 @@ class AppRepository(application: Application) {
     }
     //Functions to Access/Update LatLngData Table
 
-    suspend fun getAllLatLng(id : Int) : List<LatLngData>{
+    fun getAllLatLng(id : Int) : List<LatLngData>{
         runBlocking {
             launch(Dispatchers.Default){
                 pathLatLngList = dbLatLngDataDao!!.getItem(id)
@@ -147,6 +148,15 @@ class AppRepository(application: Application) {
         InsertAsyncTaskPath(dbPathDao).insertInBackground(Path(title = "Add title here"))
     }
 
+    fun getPathForID(id : Int): Path{
+        runBlocking {
+            launch (Dispatchers.Default){
+                pathForID = dbPathDao!!.getPath(id)
+            }
+        }
+        return pathForID
+    }
+
     fun getOneLatLngFromPath() : List<LocationTitle>{
         runBlocking {
             launch(Dispatchers.Default) {
@@ -156,7 +166,7 @@ class AppRepository(application: Application) {
         return LatLngForMarkerList
     }
 
-    fun getLatLngForCamera(id : Int) : LatLngData {
+    fun getLastLatLng(id : Int) : LatLngData {
         runBlocking {
             launch(Dispatchers.Default) {
                 LatLngForCamera = dbLatLngDataDao!!.getLatLng(id)

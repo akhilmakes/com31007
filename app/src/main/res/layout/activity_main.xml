@@ -31,5 +31,33 @@
         android:layout_margin="20dp"
         android:text="@string/tracking"/>
 
+    <Button
+        android:id="@+id/go_to_tracker_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="20dp"
+        android:text="@string/view_current_path"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/go_to_gallery_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_gallery"
+        android:contentDescription="@string/gallery_button"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp">
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/capture_image_fab_in_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="@string/add_image_to_path"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="20dp">
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

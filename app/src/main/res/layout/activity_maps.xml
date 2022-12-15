@@ -15,23 +15,24 @@
         tools:context=".view.MapActivity"/>
 
     <Button
-        android:id="@+id/control_location_service_btn"
+        android:id="@+id/stopTrackingBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="20dp"
-        android:contentDescription="@string/control_location_description"
-        android:text="@string/start"/>
+        android:contentDescription="Stop Tracking"
+        android:text="@string/stop_tracking"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/go_to_gallery_fab"
+    <Button
+        android:id="@+id/go_to_main_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_gallery"
-        android:contentDescription="@string/gallery_button"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp">
-    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+        android:layout_gravity="top|start"
+        android:layout_margin="20dp"
+        android:contentDescription="Go to main page"
+        android:text="@string/back_to_main_page"/>
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/capture_image_fab"
