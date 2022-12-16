@@ -1,6 +1,7 @@
 package com.example.week_5B_solution.view
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -87,16 +88,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 startLocationService()
 
                 startTrackingBtn.isVisible = false
-                goToTrackingPageBtn.isVisible = true
+                // goToTrackingPageBtn.isVisible = true
+                val intent = Intent(this, MapActivity::class.java)
+                startActivity(intent)
+
             }
         }
 
-
-
-        goToTrackingPageBtn.setOnClickListener{
-            val intent = Intent(this, MapActivity::class.java)
-            startActivity(intent)
-        }
 
         val galleryFab: FloatingActionButton = findViewById(R.id.go_to_gallery_fab)
 
@@ -178,6 +176,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         // Main Page. Show markers here
 
@@ -185,8 +184,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
 
-        //mMap.isMyLocationEnabled = true
-        // mMap.uiSettings.isMyLocationButtonEnabled = true
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
 
         val markerList = this.appViewModel!!.getOneLatLngFromPath()
 

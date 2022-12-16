@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +15,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.week_5B_solution.ImageApplication
 import com.example.week_5B_solution.R
 import com.example.week_5B_solution.model.ImageData
 import com.example.week_5B_solution.viewmodel.AppViewModel
@@ -30,6 +32,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -196,6 +201,14 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page2)
+
+        goToMainPageBtn.setOnClickListener{
+            finish()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
 //        val editPathTitleBtn: AppCompatButton = findViewById(R.id.editPathTitleBtn)
 
 //        binding.editPathTitleBtn.setOnClickListener {
@@ -205,6 +218,25 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     }
+
+//    private fun onUpdateButtonClickListener(view: View, position: Int){
+//        // Update the data in the model back. This is a lot of work, back and forth!
+//        MyAdapter.items[position].title = binding.editTextTitle.text.toString()
+//        MyAdapter.items[position].description = binding.editTextDescription.text.toString()
+//
+//        this.appViewModel!!.updateImage(MyAdapter.items[position])
+//
+//        runBlocking {
+//            launch(Dispatchers.IO) {
+//
+//                // Start an intent to to tell the calling activity an update happened.
+//                val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
+//                intent.putExtra("updated",true)
+//                setResult(RESULT_OK,intent)
+//                finish()
+//            }
+//        }
+//    }
 
 
     fun initPathImages(id: Int){
@@ -257,6 +289,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         mMap.addPolyline(polylineOptions)
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 15f))
 
     }
