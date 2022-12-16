@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -152,6 +153,14 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page2)
+
+        goToMainPageBtn.setOnClickListener{
+            finish()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
 //        val editPathTitleBtn: AppCompatButton = findViewById(R.id.editPathTitleBtn)
 
 //        binding.editPathTitleBtn.setOnClickListener {
@@ -201,8 +210,8 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
 
-        mMap.isMyLocationEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
+        //mMap.isMyLocationEnabled = true
+        //mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
         val polylineOptions = PolylineOptions()

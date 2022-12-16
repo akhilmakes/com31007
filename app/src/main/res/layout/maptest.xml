@@ -35,5 +35,14 @@
         android:background="@drawable/ic_baseline_mode_edit_24"
         android:contentDescription="@string/action_settings" />
 
+    <Button
+        android:id="@+id/go_to_main_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_margin="20dp"
+        android:contentDescription="Go to main page"
+        android:text="@string/back_to_main_page"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
