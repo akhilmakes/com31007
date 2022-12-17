@@ -164,11 +164,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             startActivity(intent)
 
-            val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page)
-            goToMainPageBtn.setOnClickListener {
-
-                val intent = Intent(this, MainActivity::class.java)
-            }
+//            val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page)
+//            goToMainPageBtn.setOnClickListener {
+//
+//                val intent = Intent(this, MainActivity::class.java)
+//                startActivity(intent)
+//            }
         }
 
     }

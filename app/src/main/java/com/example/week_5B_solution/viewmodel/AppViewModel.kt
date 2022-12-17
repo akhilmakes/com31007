@@ -115,4 +115,10 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
             appRepository.getTitle(id)
         }
     }
+
+    fun deletePath(id:Int){
+        viewModelScope.launch {
+            appRepository.deletePath(id)
+        }
+    }
 }

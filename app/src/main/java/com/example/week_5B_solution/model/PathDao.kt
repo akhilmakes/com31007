@@ -31,4 +31,7 @@ interface PathDao {
     @Query("select title from path where id=:id")
     fun getTitle(id: Int) : String
 
+    @Query("delete from path where id=:id")
+    fun deletePath(id:Int)
+
 }

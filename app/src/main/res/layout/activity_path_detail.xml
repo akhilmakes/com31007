@@ -56,13 +56,13 @@
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
     <Button
-        android:id="@+id/editTitleBtn"
+        android:id="@+id/deletePathBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|right"
         android:layout_margin="10dp"
-        android:text="edit"
-        android:textSize="20sp" />
+        android:text="delete"
+        android:textSize="10sp" />
 
     <Button
         android:id="@+id/go_to_main_page2"

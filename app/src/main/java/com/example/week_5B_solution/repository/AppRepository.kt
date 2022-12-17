@@ -191,4 +191,12 @@ class AppRepository(application: Application) {
         }
     }
 
+    fun deletePath(id:Int){
+        runBlocking {
+            launch(Dispatchers.Default){
+                dbPathDao!!.deletePath(id)
+            }
+        }
+    }
+
 }
