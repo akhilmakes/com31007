@@ -1,17 +1,15 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowManager.BadTokenException
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,12 +17,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.R
-import com.example.week_5B_solution.databinding.ActivityMainBinding
-import com.example.week_5B_solution.model.CameraActivity
-import com.example.week_5B_solution.model.ImageData
-import com.example.week_5B_solution.model.LocationService
-import com.example.week_5B_solution.viewmodel.AppViewModel
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.databinding.ActivityMainBinding
+import com.example.com31007_assignment.model.CameraActivity
+import com.example.com31007_assignment.model.ImageData
+import com.example.com31007_assignment.model.TrackingService
+import com.example.com31007_assignment.viewmodel.AppViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -85,7 +83,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             if(!locationPermissionsGranted()){
                 requestLocationPermissions()
             } else {
-                startLocationService()
+                startTrackingService()
                 this.appViewModel!!.generateNewPath()
                 startTrackingBtn.isVisible = false
                 // goToTrackingPageBtn.isVisible = true
@@ -143,7 +141,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
         for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
-            if(LocationService::class.java.name.equals(service.service.className)){
+            if(TrackingService::class.java.name.equals(service.service.className)){
                 if(service.foreground) return true
             }
         }
@@ -151,26 +149,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun startLocationService() {
+    private fun startTrackingService() {
         if(!isLocationServiceRunning()){
             val intent = Intent(
                 applicationContext,
-                LocationService::class.java
-            ).setAction(LocationService.ACTION_START)
+                TrackingService::class.java
+            ).setAction(TrackingService.ACTION_START)
             startService(intent)
-            Toast.makeText(this, "Starting Location Tracking", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun stopLocationService() {
-        if(isLocationServiceRunning()){
-            val intent = Intent(
-                applicationContext,
-                LocationService::class.java
-            ).setAction(LocationService.ACTION_STOP)
-            startService(intent)
-            Toast.makeText(this, "Stopping Location Tracking", Toast.LENGTH_SHORT).show()
-
+            Toast.makeText(this, "Starting Tracking Service", Toast.LENGTH_SHORT).show()
         }
     }
 

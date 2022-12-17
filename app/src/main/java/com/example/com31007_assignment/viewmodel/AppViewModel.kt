@@ -1,16 +1,15 @@
-package com.example.week_5B_solution.viewmodel
+package com.example.com31007_assignment.viewmodel
 
 import android.app.Application
-import android.media.Image
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.week_5B_solution.model.ImageData
-import com.example.week_5B_solution.model.LatLngData
-import com.example.week_5B_solution.model.LocationTitle
-import com.example.week_5B_solution.model.Path
-import com.example.week_5B_solution.repository.AppRepository
+import com.example.com31007_assignment.model.ImageData
+import com.example.com31007_assignment.model.LatLngData
+import com.example.com31007_assignment.model.LocationTitle
+import com.example.com31007_assignment.model.Path
+import com.example.com31007_assignment.repository.AppRepository
 import kotlinx.coroutines.launch
 
 class AppViewModel(application: Application): AndroidViewModel(application) {
@@ -29,6 +28,9 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
     var markerDataList : List<LocationTitle>? = null
 
     var cameraLatLng : LatLngData? = null
+
+    var airPressure: Float? = null
+
 
 
 
@@ -55,6 +57,17 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
     fun deleteImage(imageData: ImageData){
 
         viewModelScope.launch { appRepository.deleteImage(imageData) }
+
+    }
+
+    fun getLatestPressure(): Float?{
+
+        viewModelScope.launch {
+            airPressure = appRepository.getPressure()
+        }
+
+        return airPressure
+
 
     }
 

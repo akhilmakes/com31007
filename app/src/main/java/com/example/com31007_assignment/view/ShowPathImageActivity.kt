@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
@@ -19,15 +19,13 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import com.example.week_5B_solution.model.ImageDataDao
-import com.example.week_5B_solution.databinding.ActivityShowImageBinding
-import com.example.week_5B_solution.viewmodel.AppViewModel
+import com.example.com31007_assignment.model.ImageDataDao
+import com.example.com31007_assignment.databinding.ActivityShowImageBinding
+import com.example.com31007_assignment.viewmodel.AppViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 
 class ShowPathImageActivity : AppCompatActivity() {
 
@@ -102,6 +100,16 @@ class ShowPathImageActivity : AppCompatActivity() {
                     )
                     e.printStackTrace()
                 }
+
+                if(MyPathAdapter.items[position].airPressure == null) {
+
+                    binding.airPressure.setText("Pressure Sensor Not Available")
+
+                } else {
+                    binding.airPressure.setText(MyPathAdapter.items[position].airPressure.toString())
+                }
+
+
 
                 // onClick listener for the update button
                 binding.buttonSave.setOnClickListener {

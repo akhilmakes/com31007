@@ -1,12 +1,10 @@
-package com.example.week_5B_solution.repository
+package com.example.com31007_assignment.repository
 
 import android.app.Application
-import android.graphics.DiscretePathEffect
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.week_5B_solution.ImageApplication
-import com.example.week_5B_solution.model.*
-import com.google.android.gms.maps.model.LatLng
+import com.example.com31007_assignment.ImageApplication
+import com.example.com31007_assignment.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +21,8 @@ class AppRepository(application: Application) {
     private lateinit var pathTitle: String
 
     private var pathImages: List<ImageData>? = null
+
+    private var airPressure: Float? = null
 
     init {
         dbPathDao = (application as ImageApplication)
@@ -119,6 +119,20 @@ class AppRepository(application: Application) {
 
         DeleteAsyncTaskImageData(dbImageDataDao).deleteInBackground(imageData)
 
+    }
+
+    fun getPressure(): Float?{
+
+
+        runBlocking {
+            launch (Dispatchers.IO){
+
+                airPressure = dbLatLngDataDao!!.getLatestPressureReading()
+
+            }
+        }
+
+        return airPressure
     }
 
     suspend fun getPathImages(pathId: Int): List<ImageData>{

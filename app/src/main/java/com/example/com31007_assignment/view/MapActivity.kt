@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -6,11 +6,8 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.location.Location
-import android.location.LocationListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -21,17 +18,17 @@ import androidx.core.view.isVisible
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.week_5B_solution.ImageApplication
-import com.example.week_5B_solution.viewmodel.AppViewModel
-import com.example.week_5B_solution.R
+import com.example.com31007_assignment.ImageApplication
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.viewmodel.AppViewModel
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.example.week_5B_solution.databinding.ActivityMapsBinding
-import com.example.week_5B_solution.model.*
+import com.example.com31007_assignment.model.*
+import com.example.com31007_assignment.databinding.ActivityMapsBinding
 import com.google.android.gms.common.config.GservicesValue.value
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -79,6 +76,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
                 "$lat, $long"
             }
 
+            val airPressure = this.appViewModel!!.getLatestPressure()
+
 
             val imageData = ImageData(
                 title = "Add Title Here",
@@ -86,6 +85,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
                 imagePath = uri.toString(),
                 pathID = pathNumber!!,
                 latLng = latLng,
+                airPressure = airPressure,
                 dateTime = date
             )
             this.appViewModel!!.addImage(imageData, uri)
@@ -138,7 +138,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(  R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
 
@@ -154,7 +154,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
         stopTrackingButton.setOnClickListener {
             val pathInfo = this.appViewModel!!.getPathForID(pathNumber!!)
             stopTrackingButton.isVisible = false
-            stopLocationService()
+            stopTrackingService()
 
             val intent = Intent(this, PathDetailActivity::class.java)
 
@@ -163,12 +163,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
             startActivity(intent)
 
-//            val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page)
-//            goToMainPageBtn.setOnClickListener {
-//
-//                val intent = Intent(this, MainActivity::class.java)
-//                startActivity(intent)
-//            }
         }
 
     }
@@ -204,12 +198,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
     }
 
 
-    private fun isLocationServiceRunning(): Boolean {
+    private fun trackingServiceRunning(): Boolean {
 
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
         for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
-            if(LocationService::class.java.name.equals(service.service.className)){
+            if(TrackingService::class.java.name.equals(service.service.className)){
                 if(service.foreground) return true
             }
         }
@@ -217,25 +211,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     }
 
-    private fun startLocationService() {
-        if(!isLocationServiceRunning()){
+    private fun stopTrackingService() {
+        if(trackingServiceRunning()){
             val intent = Intent(
                 applicationContext,
-                LocationService::class.java
-            ).setAction(LocationService.ACTION_START)
+                TrackingService::class.java
+            ).setAction(TrackingService.ACTION_STOP)
             startService(intent)
-            Toast.makeText(this, "Starting Location Tracking", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun stopLocationService() {
-        if(isLocationServiceRunning()){
-            val intent = Intent(
-                applicationContext,
-                LocationService::class.java
-            ).setAction(LocationService.ACTION_STOP)
-            startService(intent)
-            Toast.makeText(this, "Stopping Location Tracking", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Stopping Tracking Service", Toast.LENGTH_SHORT).show()
 
         }
     }
@@ -247,14 +230,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
         if (pathNumber != null){
             latLngForPath = this.appViewModel!!.getAllLatLng(pathNumber!!)
 
-
             for(latLng in latLngForPath){
 
                 polylineOptions.add(LatLng(latLng.lat,latLng.lng))
 
             }
         }
-
 
         return polylineOptions
 

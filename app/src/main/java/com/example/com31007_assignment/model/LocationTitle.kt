@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

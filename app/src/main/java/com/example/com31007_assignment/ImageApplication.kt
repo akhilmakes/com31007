@@ -1,7 +1,7 @@
-package com.example.week_5B_solution
+package com.example.com31007_assignment
 
 import android.app.Application
-import com.example.week_5B_solution.model.AppDatabase
+import com.example.com31007_assignment.model.AppDatabase
 
 class ImageApplication: Application() {
     val databaseObj: AppDatabase by lazy { AppDatabase.getInstance(this) }

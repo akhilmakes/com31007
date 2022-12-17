@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
 
 import android.Manifest
@@ -16,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -26,13 +25,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.ImageApplication
-import com.example.week_5B_solution.R
-import com.example.week_5B_solution.model.CameraActivity
-import com.example.week_5B_solution.model.ImageData
-import com.example.week_5B_solution.model.ImageDataDao
-import com.example.week_5B_solution.model.LocationService
-import com.example.week_5B_solution.viewmodel.AppViewModel
+import com.example.com31007_assignment.ImageApplication
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.model.CameraActivity
+import com.example.com31007_assignment.model.ImageData
+import com.example.com31007_assignment.model.ImageDataDao
+import com.example.com31007_assignment.model.TrackingService
+import com.example.com31007_assignment.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
@@ -279,7 +278,7 @@ class GalleryActivity : AppCompatActivity() {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
         for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
-            if(LocationService::class.java.name.equals(service.service.className)){
+            if(TrackingService::class.java.name.equals(service.service.className)){
                 if(service.foreground) return true
             }
         }

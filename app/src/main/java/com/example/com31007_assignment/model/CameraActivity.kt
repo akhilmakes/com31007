@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import android.content.ContentValues
 import android.content.Intent
@@ -14,9 +14,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import com.example.week_5B_solution.R
-import com.example.week_5B_solution.view.GalleryActivity
-import com.example.week_5B_solution.view.GalleryActivity.Companion.FILENAME_FORMAT
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.view.GalleryActivity
+import com.example.com31007_assignment.view.GalleryActivity.Companion.FILENAME_FORMAT
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat
 import java.util.*

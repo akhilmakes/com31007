@@ -1,4 +1,4 @@
-package com.example.week_5B_solution
+package com.example.com31007_assignment
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

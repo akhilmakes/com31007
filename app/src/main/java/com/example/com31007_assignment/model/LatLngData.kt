@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -19,6 +19,7 @@ data class LatLngData(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name="lat") val lat: Double,
     @ColumnInfo(name="lng") val lng: Double,
+    @ColumnInfo(name="air_pressure") val airPressure: Float? = null,
     @ColumnInfo(name="pathID") var pathID: Int?,
     )
 { }

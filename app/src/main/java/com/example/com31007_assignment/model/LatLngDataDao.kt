@@ -1,6 +1,5 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -26,6 +25,9 @@ interface LatLngDataDao {
     // For the markers
     @Query("select * from latlng A LEFT JOIN path B On (A.pathID = B.id) group by pathID")
     fun getOneLatLngFromPath(): List<LocationTitle>
+
+    @Query("Select air_pressure from latlng order by id desc limit 1")
+    suspend fun getLatestPressureReading(): Float
 
 
 

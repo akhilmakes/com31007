@@ -1,9 +1,7 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -17,9 +15,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.ImageApplication
-import com.example.week_5B_solution.R
-import com.example.week_5B_solution.model.ImageData
+import com.example.com31007_assignment.ImageApplication
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.model.ImageData
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.File

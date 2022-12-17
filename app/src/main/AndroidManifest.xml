@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.week_5B_solution">
+    package="com.example.com31007_assignment">
 
     <uses-feature android:name="android.hardware.camera.any" />
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
@@ -25,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".ImageApplication"
+        android:name="com.example.com31007_assignment.ImageApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -42,14 +34,14 @@
             android:value="${MAPS_KEY}" />
 
         <activity
-            android:name=".view.PathDetailActivity"
+            android:name="com.example.com31007_assignment.view.PathDetailActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".view.MainActivity"
+            android:name="com.example.com31007_assignment.view.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
 
@@ -61,28 +53,28 @@
         </activity>
 
         <service
-            android:name=".model.LocationService"
+            android:name="com.example.com31007_assignment.model.TrackingService"
             android:foregroundServiceType="location" />
 
         <activity
-            android:name=".model.CameraActivity"
+            android:name="com.example.com31007_assignment.model.CameraActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".view.ShowImageActivity"
+            android:name="com.example.com31007_assignment.view.ShowImageActivity"
             android:exported="false"
             android:label="@string/title_activity_show_image" />
         <activity
-            android:name=".view.GalleryActivity"
+            android:name="com.example.com31007_assignment.view.GalleryActivity"
             android:exported="true" />
         <activity
-            android:name=".view.ShowPathImageActivity"
+            android:name="com.example.com31007_assignment.view.ShowPathImageActivity"
             android:exported="false" />
         <activity
-            android:name=".view.MapActivity"
+            android:name="com.example.com31007_assignment.view.MapActivity"
             android:exported="true"
         />
 

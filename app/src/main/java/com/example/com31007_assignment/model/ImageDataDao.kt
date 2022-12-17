@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -28,6 +28,7 @@ interface ImageDataDao {
 
     @Query("Select * from image Where pathID = :pathID")
     suspend fun getAllPathImages(pathID: Int): List<ImageData>
+
 
     @Query("select * from image order by pathID desc")
     fun sortByPath() : List<ImageData>

@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
@@ -20,6 +20,7 @@ data class ImageData(
     @ColumnInfo(name="thumbnail_filename") var thumbnail: String? = null,
     @ColumnInfo(name="lat_lng_string") var latLng: String? = null,
     @ColumnInfo(name="date_time") var dateTime: String? = null,
+    @ColumnInfo(name="air_pressure") var airPressure: Float? = null,
     @ColumnInfo(name= "pathID") val pathID: Int
 )
 { }

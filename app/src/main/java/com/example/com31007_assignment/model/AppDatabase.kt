@@ -1,11 +1,11 @@
-package com.example.week_5B_solution.model
+package com.example.com31007_assignment.model
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Path::class, LatLngData::class, ImageData::class], version = 13, exportSchema = false)
+@Database(entities = [Path::class, LatLngData::class, ImageData::class], version = 15, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun imageDataDao(): ImageDataDao

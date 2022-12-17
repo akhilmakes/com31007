@@ -1,4 +1,4 @@
-package com.example.week_5B_solution.view
+package com.example.com31007_assignment.view
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -14,20 +14,18 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.exifinterface.media.ExifInterface
-import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.week_5B_solution.ImageApplication
-import com.example.week_5B_solution.R
-import com.example.week_5B_solution.model.ImageData
-import com.example.week_5B_solution.viewmodel.AppViewModel
+import com.example.com31007_assignment.R
+import com.example.com31007_assignment.model.ImageData
+import com.example.com31007_assignment.viewmodel.AppViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.example.week_5B_solution.databinding.ActivityPathDetailBinding
-import com.example.week_5B_solution.model.LatLngData
-import com.example.week_5B_solution.model.LatLngDataDao
-import com.example.week_5B_solution.model.PathDao
+import com.example.com31007_assignment.databinding.ActivityPathDetailBinding
+import com.example.com31007_assignment.model.LatLngData
+import com.example.com31007_assignment.model.LatLngDataDao
+import com.example.com31007_assignment.model.PathDao
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -35,9 +33,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
