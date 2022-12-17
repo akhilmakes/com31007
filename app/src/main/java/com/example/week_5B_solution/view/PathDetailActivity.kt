@@ -5,8 +5,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -151,6 +153,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -165,6 +168,37 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
        
         val title = intent.getStringExtra("title")
         val pathID = intent.getIntExtra("pathID",-1)
+
+        val editTitle = findViewById<EditText>(R.id.pathTitle)
+        editTitle.setText(title)
+        val editTitleBtn = findViewById<Button>(R.id.editTitleBtn)
+
+//        editTitleBtn.setOnClickListener {
+//
+//            var title2 = editTitle.text.toString()
+//        }
+
+        editTitle.setOnKeyListener { v, keyCode, event ->
+
+            // if you press enter, then the change will be stored
+            if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
+                if (editTitle.text.toString().isEmpty()) {
+                    // make alert like title is empty
+
+                } else {
+                    var title2 = editTitle.text.toString()
+                    this.appViewModel!!.updatePathTitle(title2, pathID)
+                    editTitle.clearFocus()
+                    editTitle.requestFocus()
+                    editTitle.setText(title2)
+                    finish()
+
+                }
+
+            }
+            return@setOnKeyListener false
+
+        }
 
 
         val cameraLatLng = this.appViewModel!!.getLastLatLng(pathID)
@@ -263,7 +297,6 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val polylineOptions = PolylineOptions()
 
-        Log.d("Detail", "result is $result")
 
         for (i in result){
             polylineOptions.add(LatLng(i.lat, i.lng))

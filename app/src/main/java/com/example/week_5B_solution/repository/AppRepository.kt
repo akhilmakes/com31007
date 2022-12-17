@@ -175,12 +175,20 @@ class AppRepository(application: Application) {
         return LatLngForCamera
     }
 
-//    fun updatePathTitle(title: String, id : Int) {
-//        runBlocking {
-//            launch(Dispatchers.Default){
-//                dbPathDao!!.updateTitle(title, id)
-//            }
-//        }
-//    }
+    fun updatePathTitle(title: String, id : Int) {
+        runBlocking {
+            launch(Dispatchers.Default){
+                dbPathDao!!.updateTitle(title, id)
+            }
+        }
+    }
+
+    fun getTitle(id:Int){
+        runBlocking {
+            launch(Dispatchers.Default){
+                dbPathDao!!.getTitle(id)
+            }
+        }
+    }
 
 }

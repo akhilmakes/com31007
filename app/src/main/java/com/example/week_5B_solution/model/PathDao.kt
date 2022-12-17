@@ -25,7 +25,10 @@ interface PathDao {
     @Query("Select * from path where id = :id")
     fun getPath(id: Int): Path
 
-//    @Query("update path set title = :title where id=:id")
-//    fun updateTitle(title:String, id:Int)
+    @Query("update path set title = :title where id=:id")
+    fun updateTitle(title:String, id:Int)
+
+    @Query("select title from path where id=:id")
+    fun getTitle(id: Int) : String
 
 }

@@ -24,7 +24,7 @@ interface LatLngDataDao {
     fun getItem(id: Int): List<LatLngData>
 
     // For the markers
-    @Query("select * from latlng A LEFT JOIN path B On pathID = pathID group by pathID")
+    @Query("select * from latlng A LEFT JOIN path B On (A.pathID = B.id) group by pathID")
     fun getOneLatLngFromPath(): List<LocationTitle>
 
 

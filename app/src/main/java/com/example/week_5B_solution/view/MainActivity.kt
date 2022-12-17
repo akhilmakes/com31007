@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
-        this.appViewModel!!.generateNewPath()
+        // this.appViewModel!!.generateNewPath()
 
         checkButtonVisibility()
 
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 requestLocationPermissions()
             } else {
                 startLocationService()
-
+                this.appViewModel!!.generateNewPath()
                 startTrackingBtn.isVisible = false
                 // goToTrackingPageBtn.isVisible = true
                 val intent = Intent(this, MapActivity::class.java)
