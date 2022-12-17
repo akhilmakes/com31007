@@ -1,5 +1,6 @@
 package com.example.week_5B_solution.view
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -38,6 +39,10 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         Companion.items = items as MutableList<ImageData>
         context = cont
     }
+
+
+
+
 
     //endregion constructors
 
@@ -212,6 +217,12 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
     companion object {
         var items: MutableList<ImageData> = ArrayList<ImageData>()
 
+        fun updateList(updatedList: MutableList<ImageData>) {
+            this.items = updatedList
+        }
+
+
+
         /**
          * All functions that could block the main thread should be marked as suspending functions.
          * This forces the consumer to dispatch them to a background thread.
@@ -284,6 +295,8 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 // note the use of kotlin null assert !! - https://kotlinlang.org/docs/null-safety.html#the-operator
             }
         }
+
+
     }
 
     //region Internal classes

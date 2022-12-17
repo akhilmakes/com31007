@@ -2,6 +2,7 @@ package com.example.week_5B_solution.view
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +42,10 @@ class GalleryActivity : AppCompatActivity() {
     private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 //    private lateinit var mLayoutManager: RecyclerView.LayoutManager
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
+
+    private lateinit var searchView: SearchView
+
+
     private lateinit var daoObj: ImageDataDao
 
     private var pathNumber: Int? = null
@@ -176,6 +182,28 @@ class GalleryActivity : AppCompatActivity() {
         mAdapter = MyAdapter(this, myDataset) as RecyclerView.Adapter<RecyclerView.ViewHolder>
         mRecyclerView.adapter = mAdapter
 
+        searchView = findViewById<SearchView>(R.id.search_bar)
+
+        searchView.setOnQueryTextListener(
+
+            object : SearchView.OnQueryTextListener {
+                override fun onQueryTextChange(text: String?): Boolean {
+
+                    filterImagesByTitle(text)
+
+                    return true
+                }
+                override fun onQueryTextSubmit(text: String?): Boolean {
+
+                    filterImagesByTitle(text)
+
+                    return true
+
+                }
+
+            }
+        )
+
 
 
         // Start the CameraActivity using the ActivityResultContract registered to handle
@@ -197,6 +225,36 @@ class GalleryActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterImagesByTitle(text: String?) {
+
+        val filteredImages = mutableListOf<ImageData>()
+
+        for(image in myDataset){
+            val imageTitleMatched = image.title.lowercase().contains(text!!.lowercase())
+            if(imageTitleMatched){
+                filteredImages.add(image)
+            }
+
+        }
+        Log.d("FILTERED_IMAGES", filteredImages.toString()+" input: $text")
+
+        if(filteredImages.isEmpty()){
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+            Toast.makeText(this, "No Images Found", Toast.LENGTH_LONG).show()
+        } else {
+
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+
+        }
+
+
+
+
     }
 
     private fun isLocationServiceRunning(): Boolean {

@@ -20,6 +20,7 @@ class AppRepository(application: Application) {
     private lateinit var LatLngForMarkerList : List<LocationTitle>
     private lateinit var LatLngForCamera : LatLngData
     private lateinit var pathForID: Path
+    private lateinit var pathTitle: String
 
     private var pathImages: List<ImageData>? = null
 
@@ -183,12 +184,14 @@ class AppRepository(application: Application) {
         }
     }
 
-    fun getTitle(id:Int){
+    fun getTitle(id:Int): String{
         runBlocking {
             launch(Dispatchers.Default){
-                dbPathDao!!.getTitle(id)
+                pathTitle =  dbPathDao!!.getTitle(id)
             }
         }
+
+        return pathTitle
     }
 
     fun deletePath(id:Int){

@@ -176,7 +176,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         deletePathBtn.setOnClickListener {
             this.appViewModel!!.deletePath(pathID)
-            Toast.makeText(this, "Path deleted", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Path deleted", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
@@ -189,7 +189,7 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     // make alert like title is empty
 
                 } else {
-                    var title2 = editTitle.text.toString()
+                    val title2 = editTitle.text.toString()
                     this.appViewModel!!.updatePathTitle(title2, pathID)
                     editTitle.clearFocus()
                     editTitle.requestFocus()
@@ -317,13 +317,11 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 mMap.addMarker(MarkerOptions().position(LatLng(latLongPair[0], latLongPair[1])))
 
+                Log.d("MARKERS", "${latLongPair[0]}, ${latLongPair[1]}")
+
             }
 
-
-
         }
-
-
 
         mMap.addPolyline(polylineOptions)
 

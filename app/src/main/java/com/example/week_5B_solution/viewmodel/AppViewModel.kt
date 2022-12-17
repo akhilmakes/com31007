@@ -110,10 +110,14 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    fun getTitle(id:Int){
+    fun getTitle(id:Int): String{
+        lateinit var pathTitle: String
+
         viewModelScope.launch {
-            appRepository.getTitle(id)
+            pathTitle = appRepository.getTitle(id)
         }
+
+        return pathTitle
     }
 
     fun deletePath(id:Int){
