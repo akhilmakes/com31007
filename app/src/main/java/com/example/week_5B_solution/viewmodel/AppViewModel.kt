@@ -121,4 +121,10 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
             appRepository.deletePath(id)
         }
     }
+
+    fun searchImage(search:String){
+        viewModelScope.launch {
+            appRepository.searchImage(search)
+        }
+    }
 }

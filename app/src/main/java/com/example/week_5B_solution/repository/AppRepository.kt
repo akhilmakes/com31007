@@ -199,4 +199,12 @@ class AppRepository(application: Application) {
         }
     }
 
+    fun searchImage(search:String){
+        runBlocking {
+            launch(Dispatchers.Default){
+                dbImageDataDao!!.search(search)
+            }
+        }
+    }
+
 }
