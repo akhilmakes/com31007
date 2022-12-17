@@ -29,7 +29,7 @@ interface ImageDataDao {
     @Query("Select * from image Where pathID = :pathID")
     suspend fun getAllPathImages(pathID: Int): List<ImageData>
 
-    @Query("select * from image where (image_title like '%' || :search || '%' or image_description like '%' || :search || '%')")
-    fun search(search : String) : List<ImageData>
+    @Query("select * from image order by pathID desc")
+    fun sortByPath() : List<ImageData>
 
 }

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.location.Location
+import android.location.LocationListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -29,17 +30,15 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.week_5B_solution.databinding.ActivityMapsBinding
 import com.example.week_5B_solution.model.*
 import com.google.android.gms.common.config.GservicesValue.value
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     // FOR THE TRACKING HERE
 
@@ -272,6 +271,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         addPolylineToMap()
+
 
         // Add a marker in Sydney and move the camera
         val sheffield = LatLng(53.37, -1.462)

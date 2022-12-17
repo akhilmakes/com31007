@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.week_5B_solution.view.GalleryActivity">
-    <item android:id="@+id/action_settings"
+    <item android:id="@+id/action_sort_by_path"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        android:title="@string/action_sort_by_path"
+        app:showAsAction="always"/>
 
 </menu>

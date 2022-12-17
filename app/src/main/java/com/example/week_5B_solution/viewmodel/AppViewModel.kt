@@ -126,9 +126,11 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    fun searchImage(search:String){
+    fun sortByPathID(): List<ImageData>{
         viewModelScope.launch {
-            appRepository.searchImage(search)
+            pathImageList = appRepository.sortByPath()
         }
+
+        return pathImageList!!
     }
 }

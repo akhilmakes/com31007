@@ -202,12 +202,13 @@ class AppRepository(application: Application) {
         }
     }
 
-    fun searchImage(search:String){
+    fun sortByPath() :List<ImageData>{
         runBlocking {
             launch(Dispatchers.Default){
-                dbImageDataDao!!.search(search)
+               pathImages =  dbImageDataDao!!.sortByPath()
             }
         }
+        return pathImages!!
     }
 
 }

@@ -17,4 +17,5 @@
     <string name="back_to_tracker">Back to Tracker</string>
     <string name="view_current_path">View Current Path</string>
     <string name="back_to_main_page">Back to Main Page</string>
+    <string name="action_sort_by_path">Sort By Path</string>
 </resources>

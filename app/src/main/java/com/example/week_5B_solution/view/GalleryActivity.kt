@@ -14,7 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -84,7 +84,6 @@ class GalleryActivity : AppCompatActivity() {
                     "$lat, $long"
                 }
 
-
                 val imageData = ImageData(
                     title = "Add Title Here",
                     description = "Add Description Here",
@@ -96,7 +95,6 @@ class GalleryActivity : AppCompatActivity() {
 
                 this.appViewModel!!.addImage(imageData, uri)
                 myDataset.add(imageData)
-
 
                 mRecyclerView.scrollToPosition(myDataset.size - 1)
         }
@@ -132,8 +130,9 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
-    fun parseLatLng(exifTag: String): String{
 
+
+    fun parseLatLng(exifTag: String): String{
 
         val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
@@ -184,18 +183,20 @@ class GalleryActivity : AppCompatActivity() {
 
         searchView = findViewById<SearchView>(R.id.search_bar)
 
+        searchView.setIconifiedByDefault(false)
+
         searchView.setOnQueryTextListener(
 
             object : SearchView.OnQueryTextListener {
                 override fun onQueryTextChange(text: String?): Boolean {
 
-                    filterImagesByTitle(text)
+                    filterImages(text)
 
                     return true
                 }
                 override fun onQueryTextSubmit(text: String?): Boolean {
 
-                    filterImagesByTitle(text)
+                    filterImages(text)
 
                     return true
 
@@ -227,8 +228,10 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
+
+
     @SuppressLint("NotifyDataSetChanged")
-    private fun filterImagesByTitle(text: String?) {
+    private fun filterImages(text: String?) {
 
         val filteredImages = mutableListOf<ImageData>()
 
@@ -251,10 +254,24 @@ class GalleryActivity : AppCompatActivity() {
             mAdapter.notifyDataSetChanged()
 
         }
+    }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterImagesByPath() {
 
+        var filteredImages = mutableListOf<ImageData>()
 
+        filteredImages = this.appViewModel!!.sortByPathID().toMutableList()
 
+        Log.d("FILTERED_IMAGES", filteredImages.toString())
+
+        if(filteredImages.isEmpty()){
+            Toast.makeText(this, "No Images Yet", Toast.LENGTH_LONG).show()
+        } else {
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+
+        }
     }
 
     private fun isLocationServiceRunning(): Boolean {
@@ -283,7 +300,8 @@ class GalleryActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
-        return if (id == R.id.action_settings) {
+        return if (id == R.id.action_sort_by_path) {
+            filterImagesByPath()
             true
         } else super.onOptionsItemSelected(item)
     }
