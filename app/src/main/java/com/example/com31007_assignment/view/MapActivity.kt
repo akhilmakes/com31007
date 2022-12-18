@@ -1,6 +1,5 @@
 package com.example.com31007_assignment.view
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
@@ -12,8 +11,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.Observer
@@ -35,9 +32,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
 
 
+/**
+ * This activity is for the live tracking of the path once the user has started the tracking service.
+ * This is done by adding updated Polylines to the map.
+ */
 class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
-    // FOR THE TRACKING HERE
 
     private lateinit var latLngForPath: List<LatLngData>
 
@@ -45,6 +45,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
     private lateinit var binding: ActivityMapsBinding
 
     private var appViewModel: AppViewModel? = null
+
+    private lateinit var dbLatLngDataDao: LatLngDataDao
+    private lateinit var dbPathDao : PathDao
+
+    /**
+     * This function initialises that data access objects, that will be used to query the database.
+     */
+
+    private fun initDataDao(){
+        dbLatLngDataDao = (this@MapActivity.application as ImageApplication)
+            .databaseObj.latLngDataDao()
+        dbPathDao = (this@MapActivity.application as ImageApplication)
+            .databaseObj.pathDao()
+    }
+
+
+    //region ActivityResultContract
 
 
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
@@ -94,7 +111,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
         }
     }
 
-    fun parseLatLng(exifTag: String): String{
+    /**
+     * This function is used to convert the latitude and longitude string produced by the Exif tag
+     * to a readable format to be displayed on the image display activities.
+     *
+     * @param exifTag is the tag to be parsed into a readable format
+     *
+     * @return This function returns a string which is a readable form of the input.
+     */
+    private fun parseLatLng(exifTag: String): String{
 
         val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
@@ -108,17 +133,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     }
 
-    private lateinit var dbLatLngDataDao: LatLngDataDao
-    private lateinit var dbPathDao : PathDao
+    //endregion ActivityResultContract
 
-
-    private fun initDataDao(){
-        dbLatLngDataDao = (this@MapActivity.application as ImageApplication)
-            .databaseObj.latLngDataDao()
-        dbPathDao = (this@MapActivity.application as ImageApplication)
-                .databaseObj.pathDao()
-    }
-
+    //region Overridden functions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,37 +184,37 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     }
 
-
-    fun addPolylineToMap(){
-
-        if (pathNumber != null){
-            mMap.addPolyline(drawPath())
-        }
-
-    }
-
-
     override fun onRestart() {
         super.onRestart()
-
         addPolylineToMap()
     }
 
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(googleMap: GoogleMap) {
+        // Do live tracking here
+        mMap = googleMap
+
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
 
 
-    private fun locationPermissionsGranted() = (ContextCompat.checkSelfPermission(this,
-        Manifest.permission.ACCESS_COARSE_LOCATION) == GalleryActivity.GRANTED &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == GalleryActivity.GRANTED)
+        addPolylineToMap()
 
 
-    private fun requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-            GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION)
-
+        // Add a marker in Sydney and move the camera
+        val sheffield = LatLng(53.37, -1.462)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sheffield))
     }
 
+    //endregion Overridden functions
 
+    //region Tracking service functions
+
+    /**
+     * This function is used to check if the tracking service is running.
+     *
+     * @return true is tracking service is running.
+     */
     private fun trackingServiceRunning(): Boolean {
 
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -211,6 +228,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     }
 
+    /**
+     * This function is used to stop the foreground activity by creating an intent and setting its
+     * action to ACTION_STOP. It displays a Toast message informing the user the service has
+     * stopped.
+     */
     private fun stopTrackingService() {
         if(trackingServiceRunning()){
             val intent = Intent(
@@ -221,6 +243,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
             Toast.makeText(this, "Stopping Tracking Service", Toast.LENGTH_SHORT).show()
 
         }
+    }
+
+    //endregion Tracking service functions
+
+    //region Path drawing functions
+
+    fun addPolylineToMap(){
+
+        if (pathNumber != null){
+            mMap.addPolyline(drawPath())
+        }
+
     }
 
     fun drawPath():PolylineOptions{
@@ -241,23 +275,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback{
 
     }
 
+    //endregion Path drawing functions
 
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(googleMap: GoogleMap) {
-        // Do live tracking here
-        mMap = googleMap
-
-        mMap.isMyLocationEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-
-
-        addPolylineToMap()
-
-
-        // Add a marker in Sydney and move the camera
-        val sheffield = LatLng(53.37, -1.462)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sheffield))
-    }
 
     companion object{
         var pathNumber: Int? = null

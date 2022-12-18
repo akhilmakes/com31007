@@ -26,7 +26,6 @@ import java.io.FileOutputStream
 class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private lateinit var context: Context
 
-
     //region constructors
 
     constructor(items: List<ImageData>) {
@@ -38,13 +37,9 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         context = cont
     }
 
-
-
-
-
     //endregion constructors
 
-    //region overriden functions from RecyclerView.Adapyer super class
+    //region overridden functions from RecyclerView.Adapter super class
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         //Inflate the layout, initialize the View Holder
@@ -157,7 +152,7 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return items.size
     }
 
-    //endregion overriden functions from RecyclerView.Adapyer super class
+    //endregion overridden functions from RecyclerView.Adapter super class
 
     //region other (custom/utility) functions
 

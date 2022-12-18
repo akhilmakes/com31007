@@ -30,6 +30,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+
+/**
+ * This activity is the main page where the user can choose to start tracking a path, visit the
+ * gallery and select a path to view on the map.
+ */
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // FOR MARKERS NOT FOR THE TRACKING
