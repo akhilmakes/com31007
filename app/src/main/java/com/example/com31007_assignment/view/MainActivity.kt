@@ -39,6 +39,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var appViewModel: AppViewModel? = null
 
+    /**
+     * This function checks if the tracking service is running and controls the visibility of the
+     * start tracking and current path button.
+     */
+    private fun checkButtonVisibility(){
+
+        findViewById<Button>(R.id.startTrackingBtn).isVisible = !trackingServiceRunning()
+        findViewById<Button>(R.id.go_to_tracker_btn).isVisible = trackingServiceRunning()
+    }
+
+    //region ActivityResultContract
+
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
         val photo_uri = result.data?.extras?.getString("uri")
 
@@ -52,11 +64,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 pathID = MapActivity.pathNumber!!
             )
             this.appViewModel!!.addImage(imageData, uri)
-
-
         }
     }
 
+    //endregion ActivityResultContract
+
+    //region Overridden Functions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,53 +127,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         checkButtonVisibility()
     }
 
-
-    fun checkButtonVisibility(){
-
-        findViewById<Button>(R.id.startTrackingBtn).isVisible = !isLocationServiceRunning()
-        findViewById<Button>(R.id.go_to_tracker_btn).isVisible = isLocationServiceRunning()
-    }
-
-
-    private fun locationPermissionsGranted() = (ContextCompat.checkSelfPermission(this,
-        Manifest.permission.ACCESS_COARSE_LOCATION) == GalleryActivity.GRANTED &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == GalleryActivity.GRANTED)
-
-
-    private fun requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-            GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION)
-
-
-    }
-
-    private fun isLocationServiceRunning(): Boolean {
-
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
-            if(TrackingService::class.java.name.equals(service.service.className)){
-                if(service.foreground) return true
-            }
-        }
-        return false
-
-    }
-
-    private fun startTrackingService() {
-        if(!isLocationServiceRunning()){
-            val intent = Intent(
-                applicationContext,
-                TrackingService::class.java
-            ).setAction(TrackingService.ACTION_START)
-            startService(intent)
-            Toast.makeText(this, "Starting Tracking Service", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         // Main Page. Show markers here
@@ -201,4 +167,63 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val sheffield = LatLng(53.37, -1.462)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sheffield, 15f))
     }
+
+    //endregion Overridden Functions
+
+    //region Permissions functions
+
+    private fun locationPermissionsGranted() = (ContextCompat.checkSelfPermission(this,
+        Manifest.permission.ACCESS_COARSE_LOCATION) == GalleryActivity.GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == GalleryActivity.GRANTED)
+
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+            GalleryActivity.REQUEST_CODE_LOCATION_PERMISSION)
+
+
+    }
+
+    //endregion Permissions functions
+
+    //region Tracking service functions
+
+    /**
+     * This function is used to start the foreground activity by creating an intent and setting its
+     * action to ACTION_START. It displays a Toast message informing the user the service has
+     * started.
+     */
+    private fun startTrackingService() {
+        if(!trackingServiceRunning()){
+            val intent = Intent(
+                applicationContext,
+                TrackingService::class.java
+            ).setAction(TrackingService.ACTION_START)
+            startService(intent)
+            Toast.makeText(this, "Starting Tracking Service", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * This function is used to check if the tracking service is running.
+     *
+     * @return true is tracking service is running.
+     */
+    private fun trackingServiceRunning(): Boolean {
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
+            if(TrackingService::class.java.name.equals(service.service.className)){
+                if(service.foreground) return true
+            }
+        }
+        return false
+
+    }
+
+    //endregion Tracking service functions
+
+
 }
