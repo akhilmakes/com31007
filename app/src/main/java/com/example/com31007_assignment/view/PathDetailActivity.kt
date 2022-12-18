@@ -34,17 +34,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
-
+/**
+ * This activity displays the path taken on a small map and all the images associated to the path,
+ * if the images have latitude and longitude information markers will be displayed on the map
+ * according to the location along the path.
+ */
 class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityPathDetailBinding
     private var appViewModel: AppViewModel? = null
 
-    private lateinit var dbLatLngDataDao: LatLngDataDao
-    private lateinit var dbPathDao : PathDao
-
-    private lateinit var pathLatLngList : List<LatLngData>
     private lateinit var result : List<LatLngData>
     private lateinit var pathLocation: LatLng
 
@@ -52,6 +52,34 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
+
+    /**
+     * This function initialises all the images for the path.
+     *
+     * @param id is the pathID for which the images need to be retrieved.
+     */
+    private fun initPathImages(id: Int){
+        val pathImages = this.appViewModel!!.retrievePathImages(id)
+
+        myDataset.addAll(pathImages)
+    }
+
+    /**
+     * This function parses the LatLng information from the column latLng in the ImageData table.
+     *
+     * @param latLng is the string received from the ImageData table
+     * @return A list of double values where list[0] is latitude and list[1] is longitude
+     */
+    private fun getLatLongFromString(latLng: String): MutableList<Double> {
+
+        return mutableListOf(
+            latLng.substring(0, latLng.indexOf(",")).toDouble(),
+            latLng.substring(latLng.indexOf(",")+1).toDouble()
+
+        )
+    }
+
+    //region ActivityResultContracts
 
     val photoPicker = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let{
@@ -143,13 +171,13 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         return result.toString()
 
-
-
-
     }
 
+    //endregion ActivityResultContracts
 
-    @SuppressLint("WrongViewCast")
+    //region Overridden functions
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -161,9 +189,9 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map2) as SupportMapFragment
         mapFragment.getMapAsync(this)
-       
+
         val title = intent.getStringExtra("title")
-        val pathID = intent.getIntExtra("pathID",-1)
+        val pathID = intent.getIntExtra("pathID", -1)
 
         val editTitle = findViewById<EditText>(R.id.pathTitle)
         editTitle.setText(title)
@@ -222,68 +250,26 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         initPathImages(pathNumber!!)
 
 
-        val photoPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openGalleryFab)
+        val photoPickerFab: FloatingActionButton =
+            findViewById<FloatingActionButton>(R.id.openGalleryFab)
         photoPickerFab.setOnClickListener(View.OnClickListener { view ->
             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         })
 
         val galleryFab: FloatingActionButton = findViewById(R.id.go_to_gallery_fab)
 
-        galleryFab.setOnClickListener{
+        galleryFab.setOnClickListener {
             val intent = Intent(applicationContext, GalleryActivity::class.java)
             startActivity(intent)
         }
 
         val goToMainPageBtn = findViewById<Button>(R.id.go_to_main_page2)
 
-        goToMainPageBtn.setOnClickListener{
+        goToMainPageBtn.setOnClickListener {
             finish()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
-//        val editPathTitleBtn: AppCompatButton = findViewById(R.id.editPathTitleBtn)
-
-//        binding.editPathTitleBtn.setOnClickListener {
-//            onUpdateButtonClickListener(it, position)
-//        }
-
-
-
-    }
-
-//    private fun onUpdateButtonClickListener(view: View, position: Int){
-//        // Update the data in the model back. This is a lot of work, back and forth!
-//        MyAdapter.items[position].title = binding.editTextTitle.text.toString()
-//        MyAdapter.items[position].description = binding.editTextDescription.text.toString()
-//
-//        this.appViewModel!!.updateImage(MyAdapter.items[position])
-//
-//        runBlocking {
-//            launch(Dispatchers.IO) {
-//
-//                // Start an intent to to tell the calling activity an update happened.
-//                val intent = Intent(this@ShowImageActivity, GalleryActivity::class.java)
-//                intent.putExtra("updated",true)
-//                setResult(RESULT_OK,intent)
-//                finish()
-//            }
-//        }
-//    }
-
-
-    fun initPathImages(id: Int){
-        val pathImages = this.appViewModel!!.retrievePathImages(id)
-
-        myDataset.addAll(pathImages)
-    }
-
-    fun onViewHolderItemClick(position: Int) {
-        val intent = Intent(this, ShowPathImageActivity::class.java)
-        intent.putExtra("position", position)
-        // Start the ShowImageActivity from the ActivityResultContract registered to handle
-        // the result when the Activity returns
-        showImageActivityResultContract.launch(intent)
     }
 
     @SuppressLint("MissingPermission")
@@ -315,7 +301,6 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.d("MARKERS", "${latLongPair[0]}, ${latLongPair[1]}")
 
             }
-
         }
 
         mMap.addPolyline(polylineOptions)
@@ -323,14 +308,15 @@ class PathDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pathLocation, 15f))
 
     }
+    //endregion Overridden functions
 
-    fun getLatLongFromString(latLng: String): MutableList<Double> {
 
-        return mutableListOf(
-            latLng.substring(0, latLng.indexOf(",")).toDouble(),
-            latLng.substring(latLng.indexOf(",")+1).toDouble()
-
-        )
+    fun onViewHolderItemClick(position: Int) {
+        val intent = Intent(this, ShowPathImageActivity::class.java)
+        intent.putExtra("position", position)
+        // Start the ShowImageActivity from the ActivityResultContract registered to handle
+        // the result when the Activity returns
+        showImageActivityResultContract.launch(intent)
     }
 
     companion object{

@@ -23,9 +23,12 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
+
+/**
+ * This class controls the view of the path detail page.
+ */
 class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
     private lateinit var context: Context
-
 
     //region constructors
 
@@ -40,7 +43,7 @@ class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
 
     //endregion constructors
 
-    //region overriden functions from RecyclerView.Adapyer super class
+    //region overridden functions from RecyclerView.Adapter super class
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         //Inflate the layout, initialize the View Holder
@@ -52,36 +55,6 @@ class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-        // region collapsible comment region
-
-        //Use the provided View Holder on the onCreateViewHolder method to populate the
-        // current row on the RecyclerView
-
-        // Images added from drawable resources
-//        items[position].image?.let {
-//            holder.imageView.setImageResource(it)
-//        }
-
-
-        // Images loaded into the view
-//        items[position].file_uri?.let {
-//            holder.imageView.setImageURI(it)
-//        }
-
-        /**
-         * Thumbnail of images loaded into the view
-         */
-//        items[position].file_uri?.let{
-//             runBlocking() create a scope within the main thread - allowing safe access to Contacts.Intents.UI elements
-//            var file_uri = it  // the implicit "it" seems to be causing confusion
-
-        //************************************************************************
-        //          Code above is from the previous labs.
-        //          Commented out only to help support learning.
-        //************************************************************************
-
-        //endregion collapsed comment region
 
         // Load thumbnail from cache if it exists.
         // Thumbnails in cache may be cleared at any time,
@@ -137,7 +110,6 @@ class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
                 Log.d("Lab5B", "Got a thumbnail file object back in main thread and it exists: ${it.exists()}")
                 holder.imageView.setImageURI(it.toUri())
             }
-
         }
 
         // onClick listener added to each item in the ViewHolder
@@ -154,7 +126,7 @@ class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
         return items.size
     }
 
-    //endregion overriden functions from RecyclerView.Adapyer super class
+    //endregion overridden functions from RecyclerView.Adapter super class
 
     //region other (custom/utility) functions
 
@@ -289,9 +261,7 @@ class MyPathAdapter : RecyclerView.Adapter<MyPathAdapter.ViewHolder> {
     //region Internal classes
 
     public class ViewHolder constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        lateinit var image: Image
-//        var title: TextView = itemView.findViewById<View>(R.id.title) as TextView
-//        var preview: TextView = itemView.findViewById<View>(R.id.preview) as TextView
+
         var imageView: ImageView = itemView.findViewById<View>(R.id.image_item) as ImageView
 
     }
