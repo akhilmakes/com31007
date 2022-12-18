@@ -41,7 +41,14 @@ class TrackingService: Service(), SensorEventListener {
     private lateinit var dbLatLngDataDao: LatLngDataDao
     private lateinit var dbPathDao: PathDao
 
+    private fun initDataDao(){
+        dbPathDao = (this@TrackingService.application as ImageApplication)
+            .databaseObj.pathDao()
+        dbLatLngDataDao = (this@TrackingService.application as ImageApplication)
+            .databaseObj.latLngDataDao()
+    }
 
+    //region Overridden functions
 
     override fun onCreate() {
         super.onCreate()
@@ -50,12 +57,64 @@ class TrackingService: Service(), SensorEventListener {
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-
         locationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
+    }
+
+    /**
+     * onStartCommand is used to control starting and stopping the tracking service based on the
+     * action from the intent received.
+     */
 
 
+    @RequiresApi(Build.VERSION_CODES.S)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null){
+            val action = intent.action
+
+            if(action != null){
+                if(action == ACTION_START){
+                    startTrackingService()
+                } else if(action == ACTION_STOP){
+                    stopTrackingService()
+                }
+            }
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+
+    override fun onBind(p0: Intent?): IBinder? {
+        return null
+    }
+
+    /**
+     * onSensorChanged stores the air pressure retrieved from the sensor.
+     */
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        currentAirPressure = event!!.values[0]
+        //Log.d("SENSOR", "${event.values[0]}")
+
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, value: Int) {
+
+    }
+
+    //endregion Overridden functions
+
+    //region Functions to manipulate the tracking service
+
+    /**
+     * This function starts the foreground tracking service, it builds the notification, registers
+     * the listener for the sensor and requests location updates to store LatLngData information in
+     * the database.
+     */
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("UnspecifiedImmutableFlag", "MissingPermission")
     private fun startTrackingService(){
@@ -97,7 +156,7 @@ class TrackingService: Service(), SensorEventListener {
             }
         }
 
-        if(sensorAvailable(Sensor.TYPE_PRESSURE)){
+        if(pressureSensorAvailable()){
             barometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
             sensorManager.registerListener(this, barometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
@@ -124,31 +183,23 @@ class TrackingService: Service(), SensorEventListener {
 
     }
 
-    fun sensorAvailable(sensor: Int): Boolean{
-
-        val sensorMan = getSystemService(SENSOR_SERVICE) as SensorManager
-
-        for (i in sensorMan.getSensorList(Sensor.TYPE_ALL)){
-            if (i.type == sensor){
-                Log.d("SENSOR", i.toString())
-                return true
-            }
-        }
-
-        return false
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
-    }
+    /**
+     * This function is used to stop the foreground service and unregister the listener when the
+     * user stops the tracking service.
+     */
 
     private fun stopTrackingService(){
         sensorManager.unregisterListener(this)
         stopForeground(TRACKING_SERVICE_ID)
         stopSelf()
     }
+
+    /**
+     * This function requests location updates from the FusedLocationProviderClient and initializes
+     * the location request and location callback in a callbackFlow.
+     *
+     * @return This function returns a Flow<Location> which can be manipulated accordingly
+     */
 
     @SuppressLint("MissingPermission")
     private fun getLocationUpdates(): Flow<Location>{
@@ -181,60 +232,33 @@ class TrackingService: Service(), SensorEventListener {
 
     }
 
-    override fun onSensorChanged(event: SensorEvent?) {
+    /**
+     * This function checks if the pressure sensor is available on the user's device
+     * @return this function returns true if pressure sensor is available and false if not available
+     */
+    private fun pressureSensorAvailable(): Boolean{
 
-        currentAirPressure = event!!.values[0]
-        Log.d("SENSOR", "${event.values[0]}")
+        val sensorMan = getSystemService(SENSOR_SERVICE) as SensorManager
 
-
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, value: Int) {
-
-
-    }
-
-
-
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null){
-            val action = intent.action
-
-            if(action != null){
-                if(action == ACTION_START){
-                    startTrackingService()
-                } else if(action == ACTION_STOP){
-                    stopTrackingService()
-                }
+        for (i in sensorMan.getSensorList(Sensor.TYPE_ALL)){
+            if (i.type == Sensor.TYPE_PRESSURE){
+                Log.d("SENSOR", i.toString())
+                return true
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+
+        return false
+
     }
 
-
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
-
-    private fun initDataDao(){
-        dbPathDao = (this@TrackingService.application as ImageApplication)
-            .databaseObj.pathDao()
-        dbLatLngDataDao = (this@TrackingService.application as ImageApplication)
-            .databaseObj.latLngDataDao()
-    }
+    //endregion Functions to manipulate the tracking service
 
     companion object{
-        val TRACKING_SERVICE_ID = 175
+        val TRACKING_SERVICE_ID = 123
         val ACTION_START = "startActionService"
         val ACTION_STOP = "stopActionService"
 
-        val interval : Long = 20000
-
         var currentAirPressure: Float? = null
-
-        var currentPath: Path? = null
 
     }
 

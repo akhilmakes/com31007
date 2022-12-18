@@ -1,4 +1,4 @@
-package com.example.com31007_assignment.model
+package com.example.com31007_assignment.view
 
 import android.content.ContentValues
 import android.content.Intent
@@ -15,7 +15,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import com.example.com31007_assignment.R
-import com.example.com31007_assignment.view.GalleryActivity
 import com.example.com31007_assignment.view.GalleryActivity.Companion.FILENAME_FORMAT
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat

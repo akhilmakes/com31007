@@ -57,7 +57,7 @@
             android:foregroundServiceType="location" />
 
         <activity
-            android:name="com.example.com31007_assignment.model.CameraActivity"
+            android:name="com.example.com31007_assignment.view.CameraActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

@@ -19,7 +19,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.com31007_assignment.R
 import com.example.com31007_assignment.databinding.ActivityMainBinding
-import com.example.com31007_assignment.model.CameraActivity
 import com.example.com31007_assignment.model.ImageData
 import com.example.com31007_assignment.model.TrackingService
 import com.example.com31007_assignment.viewmodel.AppViewModel

@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.com31007_assignment.ImageApplication
 import com.example.com31007_assignment.R
-import com.example.com31007_assignment.model.CameraActivity
 import com.example.com31007_assignment.model.ImageData
 import com.example.com31007_assignment.model.ImageDataDao
 import com.example.com31007_assignment.model.TrackingService
