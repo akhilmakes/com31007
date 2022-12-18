@@ -2,11 +2,7 @@ package com.example.com31007_assignment.view
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
-import android.database.Cursor
-// import android.media.ExifInterface
-// import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import com.example.com31007_assignment.model.ImageDataDao
 import com.example.com31007_assignment.databinding.ActivityShowImageBinding
 import com.example.com31007_assignment.viewmodel.AppViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -29,9 +24,7 @@ import java.io.FileNotFoundException
 
 class ShowImageActivity : AppCompatActivity() {
 
-//    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityShowImageBinding
-    private lateinit var daoObj: ImageDataDao
 
     private var appViewModel: AppViewModel? = null
 
@@ -119,20 +112,20 @@ class ShowImageActivity : AppCompatActivity() {
                     onDeleteButtonClickListener(it, position)
                 }
 
-//                element.image?.let {
-//                    imageView.setImageResource(it)
-//                }
-//                element.file_uri?.let {
-//                    imageView.setImageURI(it)
-//                }
             }
         }
     }
 
 
-
-    fun parseLatLng(exifTag: String): String{
-
+    /**
+     * This function is used to convert the latitude and longitude string produced by the Exif tag
+     * to a readable format to be displayed on the image display activities.
+     *
+     * @param exifTag is the tag to be parsed into a readable format
+     *
+     * @return This function returns a string which is a readable form of the input.
+     */
+    private fun parseLatLng(exifTag: String): String{
         if (exifTag.toDouble() != null){
             val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
@@ -144,10 +137,7 @@ class ShowImageActivity : AppCompatActivity() {
 
             return result.toString()
         }
-
         return exifTag
-
-
     }
 
     /**
@@ -250,7 +240,7 @@ class ShowImageActivity : AppCompatActivity() {
         runBlocking {
             launch(Dispatchers.IO) {
                 // Start intent and include data to let the calling activity know a deletion happened (include position payload
-                val cacheFile = File(this@ShowImageActivity.cacheDir, MyAdapter.items[position].thumbnail)
+                val cacheFile = File(this@ShowImageActivity.cacheDir, MyAdapter.items[position].thumbnail!!)
                 cacheFile.delete()
                 MyAdapter.items.removeAt(position)
 
@@ -262,16 +252,6 @@ class ShowImageActivity : AppCompatActivity() {
                 finish()
             }
         }
-    }
-    @SuppressLint("Range")
-    fun uri2path(context: Context, contentUri: Uri): String? {
-        val proj = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor: Cursor? = context.contentResolver.query(contentUri, proj, null, null, null)
-        cursor?.moveToNext()
-        val path = cursor?.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA))
-        val uri = Uri.fromFile(File(path))
-        cursor?.close()
-        return path
     }
 
 
