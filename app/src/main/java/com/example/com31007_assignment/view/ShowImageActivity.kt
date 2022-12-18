@@ -126,18 +126,17 @@ class ShowImageActivity : AppCompatActivity() {
      * @return This function returns a string which is a readable form of the input.
      */
     private fun parseLatLng(exifTag: String): String{
-        if (exifTag.toDouble() != null){
-            val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
-            val minutes = exifTag.substring(degrees.length-1, exifTag.indexOf("/"))
+        val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
-            val seconds = exifTag.substring(minutes.length-1, exifTag.indexOf("/"))
+        val minutes = exifTag.substring(degrees.length-1, exifTag.indexOf("/"))
 
-            val result = degrees.toDouble() + (minutes.toDouble()/60) + (seconds.toDouble()/3600)
+        val seconds = exifTag.substring(minutes.length-1, exifTag.indexOf("/"))
 
-            return result.toString()
-        }
-        return exifTag
+        val result = degrees.toDouble() + (minutes.toDouble()/60) + (seconds.toDouble()/3600)
+
+        return result.toString()
+
     }
 
     /**
