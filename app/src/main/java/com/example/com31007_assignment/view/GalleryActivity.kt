@@ -38,11 +38,9 @@ import kotlinx.coroutines.*
 class GalleryActivity : AppCompatActivity() {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
-//    private lateinit var mLayoutManager: RecyclerView.LayoutManager
     private var myDataset: MutableList<ImageData> = ArrayList<ImageData>()
 
     private lateinit var searchView: SearchView
-
 
     private lateinit var daoObj: ImageDataDao
 
@@ -51,7 +49,6 @@ class GalleryActivity : AppCompatActivity() {
     private var appViewModel: AppViewModel? = null
 
     //region ActivityResultContracts
-
 
     var pickFromCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result->
             val photo_uri = result.data?.extras?.getString("uri")
@@ -130,7 +127,15 @@ class GalleryActivity : AppCompatActivity() {
 
 
 
-    fun parseLatLng(exifTag: String): String{
+    /**
+     * This function is used to convert the latitude and longitude string produced by the Exif tag
+     * to a readable format to be displayed on the image display activities.
+     *
+     * @param exifTag is the tag to be parsed into a readable format
+     *
+     * @return This function returns a string which is a readable form of the input.
+     */
+    private fun parseLatLng(exifTag: String): String{
 
         val degrees = exifTag.substring(0, exifTag.indexOf("/"))
 
@@ -147,7 +152,35 @@ class GalleryActivity : AppCompatActivity() {
 
     //endregion ActivityResultContracts
 
-    //region overriden functions from FragmentActivity super class
+    private fun initData() {
+        daoObj = (this@GalleryActivity.application as ImageApplication)
+            .databaseObj.imageDataDao()
+        runBlocking {
+            launch(Dispatchers.Default) {
+                myDataset.addAll(daoObj.getItems())
+            }
+        }
+    }
+    /**
+     * This function is used to check if the tracking service is running.
+     *
+     * @return true is tracking service is running.
+     */
+
+    private fun trackingServiceRunning(): Boolean {
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
+            if(TrackingService::class.java.name.equals(service.service.className)){
+                if(service.foreground) return true
+            }
+        }
+        return false
+
+    }
+
+    //region Overridden functions from FragmentActivity super class
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,8 +195,6 @@ class GalleryActivity : AppCompatActivity() {
 
             pathNumber = currentPath
         })
-
-        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
 
         mRecyclerView = findViewById<RecyclerView>(R.id.my_list)
 
@@ -203,12 +234,10 @@ class GalleryActivity : AppCompatActivity() {
             }
         )
 
-
-
         // Start the CameraActivity using the ActivityResultContract registered to handle
         // the result when the Activity returns
         val cameraPickerFab: FloatingActionButton = findViewById<FloatingActionButton>(R.id.openCamFab).apply {
-            if (isLocationServiceRunning()) show()
+            if (trackingServiceRunning()) show()
             else hide()
         }
         cameraPickerFab.setOnClickListener(View.OnClickListener { view ->
@@ -217,74 +246,12 @@ class GalleryActivity : AppCompatActivity() {
         })
 
 
-
-
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
     }
-
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun filterImages(text: String?) {
-
-        val filteredImages = mutableListOf<ImageData>()
-
-        for(image in myDataset){
-            val imageTitleMatched = image.title.lowercase().contains(text!!.lowercase())
-            if(imageTitleMatched){
-                filteredImages.add(image)
-            }
-
-        }
-        Log.d("FILTERED_IMAGES", filteredImages.toString()+" input: $text")
-
-        if(filteredImages.isEmpty()){
-            MyAdapter.updateList(filteredImages)
-            mAdapter.notifyDataSetChanged()
-            Toast.makeText(this, "No Images Found", Toast.LENGTH_LONG).show()
-        } else {
-
-            MyAdapter.updateList(filteredImages)
-            mAdapter.notifyDataSetChanged()
-
-        }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun filterImagesByPath() {
-
-        var filteredImages = mutableListOf<ImageData>()
-
-        filteredImages = this.appViewModel!!.sortByPathID().toMutableList()
-
-        Log.d("FILTERED_IMAGES", filteredImages.toString())
-
-        if(filteredImages.isEmpty()){
-            Toast.makeText(this, "No Images Yet", Toast.LENGTH_LONG).show()
-        } else {
-            MyAdapter.updateList(filteredImages)
-            mAdapter.notifyDataSetChanged()
-
-        }
-    }
-
-    private fun isLocationServiceRunning(): Boolean {
-
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-        for(service in activityManager.getRunningServices(Int.MAX_VALUE)){
-            if(TrackingService::class.java.name.equals(service.service.className)){
-                if(service.foreground) return true
-            }
-        }
-        return false
-
-    }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -322,19 +289,62 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
-    //endregion overriden functions from FragmentActivity super class
+    //endregion Overridden functions from FragmentActivity super class
 
-    //region other (custom/utility) functions
+    //region Image filter functions
 
-    private fun initData() {
-        daoObj = (this@GalleryActivity.application as ImageApplication)
-            .databaseObj.imageDataDao()
-        runBlocking {
-            launch(Dispatchers.Default) {
-                myDataset.addAll(daoObj.getItems())
+
+    /**
+     * This function is used to filter the images by the image title.
+     *
+     * @param text is the search text to be compared with the image title.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterImages(text: String?) {
+
+        val filteredImages = mutableListOf<ImageData>()
+
+        for(image in myDataset){
+            val imageTitleMatched = image.title.lowercase().contains(text!!.lowercase())
+            if(imageTitleMatched){
+                filteredImages.add(image)
             }
         }
+
+        if(filteredImages.isEmpty()){
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+            Toast.makeText(this, "No Images Found", Toast.LENGTH_LONG).show()
+        } else {
+
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+
+        }
     }
+
+    /**
+     * This function sorts the image list by the pathID descending by querying the database.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterImagesByPath() {
+
+        val filteredImages = this.appViewModel!!.sortByPathID().toMutableList()
+
+
+        if(filteredImages.isEmpty()){
+            Toast.makeText(this, "No Images Yet", Toast.LENGTH_LONG).show()
+        } else {
+            MyAdapter.updateList(filteredImages)
+            mAdapter.notifyDataSetChanged()
+
+        }
+
+    }
+
+    //endregion Image filter functions
+
+    //region other (custom/utility) functions
 
     /**
      * onClick listener for the Adapter's ViewHolder item click
