@@ -14,9 +14,10 @@ class AppRepository(application: Application) {
     private var dbPathDao: PathDao? = null
     private var dbLatLngDataDao: LatLngDataDao? = null
     private var dbImageDataDao: ImageDataDao? = null
+
     private lateinit var pathLatLngList : List<LatLngData>
-    private lateinit var LatLngForMarkerList : List<LocationTitle>
-    private lateinit var LatLngForCamera : LatLngData
+    private lateinit var latLngForMarkerList : List<LocationTitle>
+    private lateinit var latLngForCamera : LatLngData
     private lateinit var pathForID: Path
     private lateinit var pathTitle: String
 
@@ -25,11 +26,12 @@ class AppRepository(application: Application) {
     private var airPressure: Float? = null
 
     init {
+
         dbPathDao = (application as ImageApplication)
             .databaseObj.pathDao()
-        dbLatLngDataDao = (application as ImageApplication)
+        dbLatLngDataDao = (application)
             .databaseObj.latLngDataDao()
-        dbImageDataDao = (application as ImageApplication)
+        dbImageDataDao = (application)
             .databaseObj.imageDataDao()
 
     }
@@ -40,10 +42,7 @@ class AppRepository(application: Application) {
             suspend fun insertInBackground(vararg params: Path) {
                 scope.launch {
                     for(param in params){
-                        val insertedLatData = this@InsertAsyncTaskPath.dao?.insert(param)
-                        // you may want to check if insertedId is null to confirm successful insertion
-                        //Log.i("MyRepository", "number generated: " + param.number.toString()
-                        //        + ", inserted with id: " + insertedId.toString() + "")
+                        this@InsertAsyncTaskPath.dao?.insert(param)
                     }
                 }
             }
@@ -53,10 +52,7 @@ class AppRepository(application: Application) {
             suspend fun insertInBackground(vararg params: ImageData) {
                 scope.launch {
                     for(param in params){
-                        val insertedLatData = this@InsertAsyncTaskImageData.dao?.insert(param)
-                        // you may want to check if insertedId is null to confirm successful insertion
-                        //Log.i("MyRepository", "number generated: " + param.number.toString()
-                        //        + ", inserted with id: " + insertedId.toString() + "")
+                       this@InsertAsyncTaskImageData.dao?.insert(param)
                     }
                 }
             }
@@ -66,10 +62,7 @@ class AppRepository(application: Application) {
             suspend fun updateInBackground(vararg params: ImageData) {
                 scope.launch {
                     for(param in params){
-                        val insertedLatData = this@UpdateAsyncTaskImageData.dao?.update(param)
-                        // you may want to check if insertedId is null to confirm successful insertion
-                        //Log.i("MyRepository", "number generated: " + param.number.toString()
-                        //        + ", inserted with id: " + insertedId.toString() + "")
+                        this@UpdateAsyncTaskImageData.dao?.update(param)
                     }
                 }
             }
@@ -79,16 +72,13 @@ class AppRepository(application: Application) {
             suspend fun deleteInBackground(vararg params: ImageData) {
                 scope.launch {
                     for(param in params){
-                        val insertedLatData = this@DeleteAsyncTaskImageData.dao?.delete(param)
-                        // you may want to check if insertedId is null to confirm successful insertion
-                        //Log.i("MyRepository", "number generated: " + param.number.toString()
-                        //        + ", inserted with id: " + insertedId.toString() + "")
+                        this@DeleteAsyncTaskImageData.dao?.delete(param)
                     }
                 }
             }
         }
     }
-    //Functions to Access/Update LatLngData Table
+    //region Functions to Access/Update LatLngData Table
 
     fun getAllLatLng(id : Int) : List<LatLngData>{
         runBlocking {
@@ -101,7 +91,41 @@ class AppRepository(application: Application) {
         return pathLatLngList
     }
 
-    //Functions to Access/Update ImageData Table
+    fun getPressure(): Float?{
+
+
+        runBlocking {
+            launch (Dispatchers.IO){
+
+                airPressure = dbLatLngDataDao!!.getLatestPressureReading()
+
+            }
+        }
+
+        return airPressure
+    }
+
+    fun getOneLatLngFromPath() : List<LocationTitle>{
+        runBlocking {
+            launch(Dispatchers.Default) {
+                latLngForMarkerList = dbLatLngDataDao!!.getOneLatLngFromPath()
+            }
+        }
+        return latLngForMarkerList
+    }
+
+    fun getLastLatLng(id : Int) : LatLngData {
+        runBlocking {
+            launch(Dispatchers.Default) {
+                latLngForCamera = dbLatLngDataDao!!.getLatLng(id)
+            }
+        }
+        return latLngForCamera
+    }
+
+    //endregion Functions to Access/Update LatLngData Table
+
+    //region Functions to Access/Update ImageData Table
 
     suspend fun insertImage(imageData: ImageData){
 
@@ -121,28 +145,12 @@ class AppRepository(application: Application) {
 
     }
 
-    fun getPressure(): Float?{
-
-
-        runBlocking {
-            launch (Dispatchers.IO){
-
-                airPressure = dbLatLngDataDao!!.getLatestPressureReading()
-
-            }
-        }
-
-        return airPressure
-    }
-
     suspend fun getPathImages(pathId: Int): List<ImageData>{
-
-
 
         runBlocking {
             launch(Dispatchers.Default){
 
-               pathImages = dbImageDataDao!!.getAllPathImages(pathId)
+                pathImages = dbImageDataDao!!.getAllPathImages(pathId)
 
             }
         }
@@ -151,9 +159,18 @@ class AppRepository(application: Application) {
 
     }
 
+    fun sortByPath() :List<ImageData>{
+        runBlocking {
+            launch(Dispatchers.Default){
+                pathImages =  dbImageDataDao!!.sortByPath()
+            }
+        }
+        return pathImages!!
+    }
 
+    //endregion Functions to Access/Update ImageData Table
 
-    //Functions to Access/Update Path Table
+    //region Functions to Access/Update Path Table
 
     fun getPathNum(): LiveData<Int> {
         return dbPathDao!!.getLatestPathNum()
@@ -170,24 +187,6 @@ class AppRepository(application: Application) {
             }
         }
         return pathForID
-    }
-
-    fun getOneLatLngFromPath() : List<LocationTitle>{
-        runBlocking {
-            launch(Dispatchers.Default) {
-                LatLngForMarkerList = dbLatLngDataDao!!.getOneLatLngFromPath()
-            }
-        }
-        return LatLngForMarkerList
-    }
-
-    fun getLastLatLng(id : Int) : LatLngData {
-        runBlocking {
-            launch(Dispatchers.Default) {
-                LatLngForCamera = dbLatLngDataDao!!.getLatLng(id)
-            }
-        }
-        return LatLngForCamera
     }
 
     fun updatePathTitle(title: String, id : Int) {
@@ -216,13 +215,7 @@ class AppRepository(application: Application) {
         }
     }
 
-    fun sortByPath() :List<ImageData>{
-        runBlocking {
-            launch(Dispatchers.Default){
-               pathImages =  dbImageDataDao!!.sortByPath()
-            }
-        }
-        return pathImages!!
-    }
+    //endregion Functions to Access/Update Path Table
+
 
 }

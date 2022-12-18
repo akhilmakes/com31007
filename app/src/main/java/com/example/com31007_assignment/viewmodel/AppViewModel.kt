@@ -16,13 +16,12 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
 
     private var appRepository: AppRepository = AppRepository(application)
 
-    private var currentPath: LiveData<Int>
+    private var currentPath: LiveData<Int> = appRepository.getPathNum()
 
     private var pathImageList: List<ImageData>? = null
 
     private var pathInfo: Path? = null
 
-    //private var pathData: List<LatLngData>
     var allLatLngList : List<LatLngData>? = null
 
     var markerDataList : List<LocationTitle>? = null
@@ -30,14 +29,6 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
     var cameraLatLng : LatLngData? = null
 
     var airPressure: Float? = null
-
-
-
-
-    init {
-        currentPath = appRepository.getPathNum()
-        // pathData = appRepository.getAllLatLng()
-    }
 
 
     fun addImage(imageData: ImageData, uri: Uri): ImageData {
@@ -123,15 +114,6 @@ class AppViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    fun getTitle(id:Int): String{
-        lateinit var pathTitle: String
-
-        viewModelScope.launch {
-            pathTitle = appRepository.getTitle(id)
-        }
-
-        return pathTitle
-    }
 
     fun deletePath(id:Int){
         viewModelScope.launch {
